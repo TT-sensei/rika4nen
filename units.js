@@ -221,5 +221,5 @@ const EXTRA_FOUR = {
  heating:[k("heating-k5","金属を熱したとき、熱はどのように伝わる？",["熱した部分から順に広がる","一瞬で全部同じになる","下からだけ伝わる"],0,"金属では熱した部分から周りへ熱が伝わります。"),c("heating-c4","金属棒のろうが熱した場所から順にとけた。何が分かる？","金属棒にろうを等間隔につけて一端を熱した。",["熱が金属を伝わった","ろうが自分で移動した","金属が水を出した"],0,"ろうがとける順序を証拠に、熱の伝わり方を考えます。")],
  waterstate:[k("waterstate-k5","水が水蒸気になる変化を何という？",["蒸発","凝固","融解"],0,"水が液体から気体になる変化が蒸発です。"),c("waterstate-c4","氷を温めると水になった。これは？","氷を温め、温度とようすを記録した。",["固体から液体への融解","気体から液体への凝結","燃焼"],0,"温度と状態の記録から、状態変化の名前を判断します.")]
 };
-window.SCIENCE_UNITS.forEach(unit=>{(EXTRA_FOUR[unit.id]||[]).forEach(item=>unit[item.id.includes("-k")?"knowledge":"consideration"].push(item));});
+window.SCIENCE_UNITS.forEach(unit=>{(EXTRA_FOUR[unit.id]||[]).forEach(item=>unit[item.id.includes("-k")?"knowledge":"consideration"].push(item)); const base=unit.preparation[0]; unit.preparation.push({...base,id:`${unit.id}-p3`,title:`追加研究：${base.title}`});});
 })();
