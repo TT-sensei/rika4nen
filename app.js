@@ -167,6 +167,11 @@
     const entry = reviewState.questions[reviewState.index], unit = unitById(entry.unitId), item = entry.item;
     app.innerHTML = `<div class="review-head"><div><p class="eyebrow">10単元のテスト対策</p><h1>まとめチェック</h1><p>関係・予想・理由を、各単元から1問ずつ確かめます。</p></div><b>${reviewState.index + 1} / ${reviewState.questions.length}</b></div><article class="activity-card review-card" style="${unitStyle(unit)}"><span class="activity-count">${unit.icon} ${unit.title}</span><h2>${item.prompt}</h2><div class="evidence"><b>観察・実験の結果</b>${item.evidence}</div><div class="choices">${item.choices.map((choice,i)=>`<button class="choice" data-review-choice="${i}">${escapeHtml(choice)}</button>`).join("")}</div><div class="answer-area"></div></article>`;
   }
+    app.querySelectorAll("[data-review-choice]").forEach(button => button.addEventListener("click", event => {
+      event.stopPropagation();
+      answerReview(Number(button.dataset.reviewChoice));
+    }));
+
   function answerReview(choiceIndex) {
     const entry = reviewState.questions[reviewState.index], correct = choiceIndex === entry.item.answer;
     if (correct) reviewState.score += 1; else reviewState.misses.push(entry);
@@ -206,7 +211,6 @@
     else if (target.dataset.nextBatch && route.page === "unit") routeTo(`unit/${route.unitId}/${route.phase}/0`);
     else if (target.dataset.nextPhase === "home") routeTo("");
     else if (target.dataset.nextPhase && route.page === "unit") routeTo(`unit/${route.unitId}/${target.dataset.nextPhase}/0`);
-    else if (target.dataset.reviewChoice) answerReview(Number(target.dataset.reviewChoice));
     else if (target.matches("[data-retry-review]")) { reviewState = null; renderReview(); }
   });
   document.querySelector("#homeButton").addEventListener("click", () => routeTo(""));
