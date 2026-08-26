@@ -60,6 +60,12 @@
     return String(value).replace(/[&<>"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[char]));
   }
 
+  function shuffledChoices(item) {
+    return item.choices
+      .map((choice, originalIndex) => ({ choice, originalIndex }))
+      .sort(() => Math.random() - .5);
+  }
+
   function routeTo(path) {
     location.hash = path;
     if (location.hash === path) render();
@@ -173,7 +179,7 @@
       <h2>${item.prompt || item.question}</h2>
       ${isKnowledge && item.pair ? `<div class="pair-box"><div class="pair-item">${item.pair[0]}</div><span class="pair-vs">対にして覚える</span><div class="pair-item">${item.pair[1]}</div></div>` : ""}
       ${item.evidence ? `<div class="evidence"><b>観察・実験の結果</b>${item.evidence}</div>` : ""}
-      <div class="choices" role="group" aria-label="答えを選ぶ">${item.choices.map((choice,i) => `<button class="choice" data-choice="${i}">${escapeHtml(choice)}</button>`).join("")}</div>
+      <div class="choices" role="group" aria-label="答えを選ぶ">${shuffledChoices(item).map(entry => `<button class="choice" data-choice="${entry.originalIndex}">${escapeHtml(entry.choice)}</button>`).join("")}</div>
       <div class="answer-area"></div>
       <div class="action-row"><button class="secondary-button" data-prev ${index===0?"disabled":""}>前へ</button><button class="primary-button" data-check disabled>答えを確かめる</button></div>`;
   }
@@ -267,11 +273,12 @@
     answerState.checked = true;
     const correct = answerState.selected === ctx.item.answer;
     recordAttempt(ctx, correct);
-    document.querySelectorAll(".choice").forEach((el, i) => {
+    document.querySelectorAll(".choice").forEach(el => {
+      const choiceIndex = Number(el.dataset.choice);
       el.disabled = true;
       el.classList.remove("selected");
-      if (i === ctx.item.answer) el.classList.add("correct");
-      if (i === answerState.selected && !correct) el.classList.add("wrong");
+      if (choiceIndex === ctx.item.answer) el.classList.add("correct");
+      if (choiceIndex === answerState.selected && !correct) el.classList.add("wrong");
     });
     showFeedback(correct, ctx.item.explanation);
     playTone(correct);
@@ -337,7 +344,7 @@
     app.innerHTML = `<div class="review-head"><div><p class="eyebrow">10単元のテスト対策</p><h1>まとめチェック</h1><p>各単元から3問ずつ、関係・予想・理由を確かめます。</p></div><b>${reviewState.index + 1} / ${reviewState.questions.length}</b></div>
       <article class="activity-card review-card" style="${unitStyle(unit)}">
         <span class="activity-count">${unit.icon} ${unit.title}</span><h2>${item.prompt || item.question}</h2>
-        <div class="choices">${item.choices.map((choice,i)=>`<button class="choice" data-review-choice="${i}">${escapeHtml(choice)}</button>`).join("")}</div>
+        <div class="choices">${shuffledChoices(item).map(entry=>`<button class="choice" data-review-choice="${entry.originalIndex}">${escapeHtml(entry.choice)}</button>`).join("")}</div>
         <div class="answer-area"></div>
       </article>`;
     app.querySelectorAll("[data-review-choice]").forEach(button => button.addEventListener("click", event => {
@@ -355,10 +362,11 @@
     if (correct) reviewState.score += 1;
     else reviewState.misses.push(entry);
 
-    app.querySelectorAll("[data-review-choice]").forEach((button, index) => {
+    app.querySelectorAll("[data-review-choice]").forEach(button => {
+      const originalIndex = Number(button.dataset.reviewChoice);
       button.disabled = true;
-      if (index === item.answer) button.classList.add("correct");
-      if (index === choiceIndex && !correct) button.classList.add("wrong");
+      if (originalIndex === item.answer) button.classList.add("correct");
+      if (originalIndex === choiceIndex && !correct) button.classList.add("wrong");
     });
 
     const answerArea = app.querySelector(".answer-area");
