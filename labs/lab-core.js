@@ -49,30 +49,31 @@
     const value = config.value, format = config.format || (value => value), onInput = config.onInput;
     const id = "lab-range-" + Math.random().toString(36).slice(2);
     const row = document.createElement("label");
-    row.className = "range-control";
+    row.className = "range-control instant-range";
     row.innerHTML = '<span>' + esc(label) + '<output for="' + id + '">' + esc(format(value)) + '</output></span><input id="' + id + '" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + value + '">';
     const input = row.querySelector("input");
     const output = row.querySelector("output");
     const update = next => { input.value = next; output.textContent = format(Number(next)); };
     input.addEventListener("input", () => { output.textContent = format(Number(input.value)); if (onInput) onInput(Number(input.value)); });
     parent.append(row);
-    return { input, output, set: update };
+    return { input, output, set: update, element: row };
   }
 
   function options(parent, config) {
     const label = config.label, values = config.values, value = config.value;
     const format = config.format || (item => item.label), onChange = config.onChange;
     const wrap = document.createElement("div");
-    wrap.className = "segmented-control";
+    wrap.className = "segmented-control instant-control";
     wrap.innerHTML = '<span>' + esc(label) + '</span><div>' + values.map(item => {
       const id = item.id !== undefined ? item.id : item;
       return '<button type="button" data-option-value="' + esc(id) + '" aria-pressed="' + (String(id) === String(value)) + '">' + esc(format(item)) + '</button>';
     }).join("") + '</div>';
+    wrap.querySelector("div").classList.add("instant-options");
     const buttons = Array.from(wrap.querySelectorAll("button"));
     const set = next => buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.optionValue) === String(next)));
     buttons.forEach(button => button.addEventListener("click", () => { set(button.dataset.optionValue); if (onChange) onChange(button.dataset.optionValue); }));
     parent.append(wrap);
-    return { set };
+    return { set, element: wrap };
   }
 
   function action(parent, label, onClick, className) {
@@ -87,7 +88,7 @@
 
   function presets(parent, items, onSelect) {
     const wrap = section(parent, "プリセット", "まずはここから試してもOK");
-    wrap.classList.add("preset-section");
+    wrap.classList.add("preset-section", "instant-presets");
     const row = document.createElement("div");
     row.className = "preset-buttons";
     items.forEach(item => action(row, item.label, () => onSelect(item.id), "preset-button"));
@@ -97,7 +98,7 @@
 
   function renderReadout(target, config) {
     const metrics = config.metrics || [];
-    target.innerHTML = '<div class="instant-readout-grid">' + metrics.map(metric =>
+    target.innerHTML = '<div class="instant-readout-grid extra-readout-grid">' + metrics.map(metric =>
       '<div class="instant-metric"><span>' + esc(metric.label) + '</span><b>' + esc(metric.value) + '</b>' + (metric.detail ? '<small>' + esc(metric.detail) + '</small>' : '') + '</div>'
     ).join("") + '</div><div class="instant-result"><strong>結果</strong><p>' + esc(config.message || "") + '</p></div>' + (config.note ? '<p class="instant-note">' + esc(config.note) + '</p>' : "");
   }
