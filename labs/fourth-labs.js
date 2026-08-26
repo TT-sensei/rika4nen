@@ -158,28 +158,40 @@
 
   function rainwater(view, core) {
     const state = { slope: 55, ground: "sand" };
-    const section = core.section(view.panel, "地面の条件を変える", "傾きと地面の種類を変えて、水のゆくえを比べよう。");
+    const section = core.section(view.panel, "地面の条件を変える", "地面の高い所・低い所と、水のしみこむ向きを線で確かめよう。");
     const slope = core.range(section, { label: "地面の傾き", min: 0, max: 100, value: state.slope, format: value => value + "%", onInput: value => { state.slope = value; draw(); } });
     const ground = core.options(section, { label: "地面", values: [option("sand", "砂"), option("soil", "細かい土"), option("concrete", "コンクリート")], value: state.ground, format: item => item.label, onChange: value => { state.ground = value; draw(); } });
     function draw() {
       const infiltration = { sand: 88, soil: 54, concrete: 6 }[state.ground];
       const speed = Math.round(state.slope * .75);
       const runoff = Math.round((100 - infiltration) * (.25 + state.slope * .0075));
-      const dots = Array.from({ length: Math.max(1, Math.round(infiltration / 15)) }, (_, i) => '<circle cx="' + (205 + i * 30) + '" cy="' + (294 + (i % 2) * 17) + '" r="5" fill="#4b94ae" opacity="' + (infiltration / 100) + '"/>').join("");
-      const arrows = state.slope > 0 ? '<path d="M165 170 Q300 ' + (210 - state.slope * .35) + ' 495 250" fill="none" stroke="#4b94ae" stroke-width="8" stroke-linecap="round" stroke-dasharray="13 12"/><path d="M480 238 l25 12 -23 14" fill="none" stroke="#4b94ae" stroke-width="7"/>' : '<ellipse cx="365" cy="245" rx="48" ry="14" fill="#7db6c0"/>';
+      const groundName = {sand:"砂",soil:"細かい土",concrete:"コンクリート"}[state.ground];
+      const groundColor = {sand:"#d7c08c",soil:"#a98d72",concrete:"#aeb9bc"}[state.ground];
+      const leftY = Math.round(270 - state.slope * .72), rightY = 270;
+      const surface = 'M85 ' + leftY + ' Q320 ' + ((leftY + rightY) / 2 + 5) + ' 555 ' + rightY;
+      const drops = [155,220,285,350].map((x,i) => '<path d="M' + x + ' 105 v42" stroke="#4b94ae" stroke-width="4" marker-end="url(#waterArrow)" opacity="' + (.65 + i*.08) + '"/>').join("");
+      const soakCount = Math.max(1, Math.round(infiltration / 18));
+      const soak = Array.from({ length: soakCount }, (_, i) => {
+        const x = 175 + i * 48;
+        const t = (x - 85) / 470;
+        const y = leftY + (rightY - leftY) * t + 4;
+        return '<path class="soak-arrow" d="M' + x + ' ' + y + ' v' + (22 + infiltration * .28) + '" stroke="#3d8fa9" stroke-width="4" marker-end="url(#waterArrow)" opacity="' + (.35 + infiltration/180) + '"/>';
+      }).join("");
+      const flow = state.slope > 0 ? '<path class="runoff-arrow" d="' + surface + '" fill="none" stroke="#398da9" stroke-width="' + (5 + runoff*.05) + '" stroke-linecap="round" marker-end="url(#waterArrow)"/>' : '<ellipse cx="350" cy="260" rx="68" ry="12" fill="#74b9cc"/>';
       view.stage.innerHTML =
-        '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="雨水の流れとしみこみ">' +
-          '<rect width="640" height="360" fill="#edf6fa"/><text x="28" y="42" class="scene-title">雨水はどこへ行く？</text><text x="30" y="78" class="scene-caption">傾き ' + state.slope + '%　' + ({sand:"砂",soil:"細かい土",concrete:"コンクリート"}[state.ground]) + '</text>' +
-          '<path d="M70 280 Q260 ' + (260 - state.slope * .35) + ' 550 ' + (280 - state.slope * .7) + ' L640 360 H0Z" fill="' + ({sand:"#d7c08c",soil:"#a98d72",concrete:"#aeb9bc"}[state.ground]) + '"/>' +
-          '<path d="M105 281 Q260 ' + (261 - state.slope * .35) + ' 550 ' + (281 - state.slope * .7) + '" fill="none" stroke="#75624e" stroke-width="3"/>' + arrows + dots +
-          '<path d="M520 297 Q570 286 610 300 Q578 339 530 322Z" fill="#80bfd1" opacity="' + clamp(runoff / 70, .15, .95) + '"/><text x="486" y="343" class="component-label">低い場所に集まる</text>' +
-          '<text x="95" y="145" class="component-label">雨</text><path d="M105 155 l-8 24 M125 155 l-8 24 M145 155 l-8 24" stroke="#4b94ae" stroke-width="4"/></svg>';
+        '<svg class="extra-svg rainwater-diagram" viewBox="0 0 640 360" role="img" aria-label="雨水が高い場所から低い場所へ流れ、一部は地面の下へしみこむ様子">' +
+          '<defs><marker id="waterArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#398da9"/></marker></defs><rect width="640" height="360" fill="#edf6fa"/>' +
+          '<text x="28" y="38" class="scene-title">雨水の2つの行き先</text><text x="30" y="74" class="scene-caption">①低い方へ流れる　②地面の中へしみこむ</text>' + drops +
+          '<path d="' + surface + ' L640 360 H0Z" fill="' + groundColor + '"/><path d="' + surface + '" fill="none" stroke="#75624e" stroke-width="4"/>' + flow + soak +
+          '<text x="70" y="' + Math.max(105,leftY-16) + '" class="component-label">高い</text><text x="528" y="252" class="component-label">低い</text><path d="M555 282 Q592 270 622 286 Q596 331 548 316Z" fill="#6db4ca" opacity="' + clamp(runoff / 65, .18, .95) + '"/>' +
+          '<g transform="translate(35 300)"><rect width="465" height="38" rx="11" fill="#fff" opacity=".92"/><text x="16" y="25" class="component-label">青い横矢印＝流れる　　青い下矢印＝しみこむ　　地面：' + groundName + '</text></g>' +
+        '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
-          { label: "流れる速さ", value: speed + " / 75", detail: state.slope === 0 ? "流れずにたまる" : "傾きで変化" },
-          { label: "しみこみ", value: infiltration + "%", detail: state.ground === "sand" ? "すき間が大きい" : state.ground === "concrete" ? "ほぼ通さない" : "土のすき間" }
+          { label: "表面を流れる速さ", value: speed + " / 75", detail: state.slope === 0 ? "くぼみにたまる" : "高い所から低い所へ" },
+          { label: "地面へのしみこみ", value: infiltration + "%", detail: state.ground === "sand" ? "すき間が大きい" : state.ground === "concrete" ? "ほとんど通さない" : "土のすき間" }
         ],
-        message: "傾きは流れる速さに、地面の種類はしみこみやすさに関係します。"
+        message: "雨水は高い所から低い所へ流れます。地面の種類によって、下へしみこむ量が変わります。"
       });
     }
     return {
@@ -202,34 +214,39 @@
     }
     function draw() {
       const phaseIndex = Math.round((state.day % 30) / 30 * 8) % 8;
-      const phaseNames = ["新月", "細い月", "上弦の月", "ふくらむ月", "満月", "欠ける月", "下弦の月", "細い月"];
+      const phaseNames = ["新月", "三日月ごろ", "上弦の月", "満月に近づく月", "満月", "欠け始めた月", "下弦の月", "明け方の細い月"];
       const phase = phaseNames[phaseIndex];
-      const x = 150 + ((state.time - 18) / 6) * 330;
-      const y = 225 - Math.sin(((state.time - 18) / 6) * Math.PI) * 95;
-      const shift = (state.time - 18) * 38;
-      const stars = Array.from({ length: 18 }, (_, i) => {
-        const sx = 55 + ((i * 83 + shift) % 530);
-        const sy = 105 + ((i * 47 + Math.round(shift * .35)) % 125);
-        return '<circle cx="' + sx + '" cy="' + sy + '" r="' + (i % 3 + 2) + '" fill="#dce8ff" opacity="' + (.4 + (i % 4) * .12) + '"/>';
-      }).join("");
-      const movingMoon = '<circle cx="' + x + '" cy="' + y + '" r="35" fill="#f2e8b2" stroke="#d2c77e" stroke-width="3"/>';
-      const phaseMoon = '<circle cx="320" cy="185" r="58" fill="#f2e8b2"/><circle cx="' + (320 + (phaseIndex - 4) * 16) + '" cy="185" r="58" fill="#17264c"/>';
-      const visual = state.target === "stars" ? stars : state.target === "phase" ? stars + phaseMoon : stars + movingMoon;
+      const ratio = (state.time - 18) / 6;
+      const x = 115 + ratio * 410;
+      const y = 265 - Math.sin(ratio * Math.PI) * 145;
+      const baseStars = [[75,115,3],[135,155,2],[205,103,3],[275,178,2],[355,112,2],[440,164,3],[525,105,2],[575,205,2]].map(item => '<circle cx="' + item[0] + '" cy="' + item[1] + '" r="' + item[2] + '" fill="#dce8ff" opacity=".62"/>').join("");
+      const constellation = [[0,15],[38,0],[76,18],[112,5],[145,35],[180,22],[212,48]];
+      const constellationShift = 65 + ratio * 240;
+      const constellationSvg = '<g transform="translate(' + constellationShift + ' 115)"><polyline points="' + constellation.map(p => p[0] + "," + p[1]).join(" ") + '" fill="none" stroke="#8da7d9" stroke-width="2"/>' + constellation.map(p => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="5" fill="#f1f5ff"/>').join("") + '</g>';
+      let phaseArt = '<circle cx="320" cy="185" r="58" fill="#17264c" stroke="#d2c77e" stroke-width="3"/>';
+      if (phaseIndex === 1) phaseArt = '<circle cx="320" cy="185" r="58" fill="#f2e8b2"/><circle cx="292" cy="185" r="58" fill="#17264c" clip-path="url(#moonClip)"/>';
+      if (phaseIndex === 2) phaseArt = '<circle cx="320" cy="185" r="58" fill="#17264c"/><path d="M320 127 A58 58 0 0 1 320 243 L320 127Z" fill="#f2e8b2"/>';
+      if (phaseIndex === 3) phaseArt = '<circle cx="320" cy="185" r="58" fill="#f2e8b2"/><ellipse cx="286" cy="185" rx="28" ry="58" fill="#17264c" clip-path="url(#moonClip)"/>';
+      if (phaseIndex === 4) phaseArt = '<circle cx="320" cy="185" r="58" fill="#f2e8b2" stroke="#d2c77e" stroke-width="3"/>';
+      if (phaseIndex === 5) phaseArt = '<circle cx="320" cy="185" r="58" fill="#f2e8b2"/><ellipse cx="354" cy="185" rx="28" ry="58" fill="#17264c" clip-path="url(#moonClip)"/>';
+      if (phaseIndex === 6) phaseArt = '<circle cx="320" cy="185" r="58" fill="#17264c"/><path d="M320 127 A58 58 0 0 0 320 243 L320 127Z" fill="#f2e8b2"/>';
+      if (phaseIndex === 7) phaseArt = '<circle cx="320" cy="185" r="58" fill="#f2e8b2"/><circle cx="348" cy="185" r="58" fill="#17264c" clip-path="url(#moonClip)"/>';
+      const moonPosition = '<path d="M95 272 Q320 70 545 272" fill="none" stroke="#7186bb" stroke-width="3" stroke-dasharray="8 8"/><circle class="moving-moon" cx="' + x + '" cy="' + y + '" r="32" fill="#f2e8b2" stroke="#d2c77e" stroke-width="3"/><path d="M' + (x - 34) + ' ' + (y + 44) + ' h68" stroke="#f2e8b2" stroke-width="2"/><text x="' + (x - 30) + '" y="' + (y + 62) + '" fill="#eef4ff" class="tiny-label">いまの月</text>';
+      const visual = state.target === "phase" ? '<defs><clipPath id="moonClip"><circle cx="320" cy="185" r="58"/></clipPath></defs>' + baseStars + phaseArt : state.target === "stars" ? baseStars + constellationSvg + '<path d="M100 250 H535" stroke="#7186bb" stroke-width="3" marker-end="url(#skyArrow)"/>' : baseStars + moonPosition;
+      const guide = state.target === "phase" ? '<text x="167" y="286" fill="#dce8ff" class="scene-caption">日にちを進める → 明るい部分の形が変わる</text>' : '<text x="92" y="314" fill="#dce8ff" class="component-label">東（のぼる）</text><text x="451" y="314" fill="#dce8ff" class="component-label">西（しずむ）</text>';
       view.stage.innerHTML =
-        '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="月と星の見え方">' +
-          '<rect width="640" height="360" fill="#17264c"/>' + visual + '<text x="28" y="42" fill="#eef4ff" class="scene-title">月と星を観察しよう</text>' +
-          '<path d="M90 280 Q320 90 570 280" fill="none" stroke="#6677a8" stroke-width="2" stroke-dasharray="7 8"/>' +
-          '<text x="28" y="82" fill="#dce8ff" class="scene-caption">' + (state.target === "phase" ? state.day + "日目　" + phase : state.time + "時") + '</text>' +
-          '<text x="255" y="328" fill="#dce8ff" class="component-label">東</text><text x="480" y="328" fill="#dce8ff" class="component-label">西</text></svg>';
+        '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="月の形と、月や星が東から西へ動いて見える様子">' +
+          '<defs><marker id="skyArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#8da7d9"/></marker></defs><rect width="640" height="360" fill="#17264c"/>' + visual +
+          '<text x="28" y="38" fill="#eef4ff" class="scene-title">' + (state.target === "phase" ? "月の明るい形を見る" : state.target === "stars" ? "星の並びを追う" : "同じ夜の月を追う") + '</text><text x="30" y="75" fill="#dce8ff" class="scene-caption">' + (state.target === "phase" ? state.day + "日目　" + phase : state.time + "時") + '</text>' + guide + '</svg>';
       core.renderReadout(view.readout, {
         metrics: state.target === "phase" ? [
           { label: "観察日", value: state.day + "日目", detail: "日を変えて比べる" },
-          { label: "月の形", value: phase, detail: "約30日のモデル" }
+          { label: "月の形", value: phase, detail: "黄色が明るく見える部分" }
         ] : [
           { label: "時刻", value: state.time + "時", detail: "同じ夜" },
-          { label: state.target === "stars" ? "星の見え方" : "月の位置", value: Math.round(x) < 320 ? "東より" : "西より", detail: "並び方を保って動く" }
+          { label: state.target === "stars" ? "星の並び" : "月の位置", value: state.target === "stars" ? "形を保って西へ" : x < 280 ? "東より" : x > 410 ? "西より" : "南の空の高い所", detail: "東から西へ動いて見える" }
         ],
-        message: state.target === "phase" ? "日にちを変えると月の形が変わります。時刻による動きとは分けて考えます。" : state.target === "stars" ? "星は並び方をほぼ保ったまま、東から西へ動いて見えます。" : "同じ夜に時間がたつと、月は東から西の方へ動いて見えます。"
+        message: state.target === "phase" ? "黄色い部分が、太陽の光を受けて明るく見える部分です。日にちを変えると形が変わります。" : state.target === "stars" ? "星は並び方をほぼ保ったまま、時間とともに東から西へ動いて見えます。" : "同じ夜に時間がたつと、月は東から西の方へ動いて見えます。"
       });
     }
     toggleControls();
@@ -242,30 +259,33 @@
 
   function electricity(view, core) {
     const state = { batteries: 1, direction: "normal" };
-    const section = core.section(view.panel, "乾電池の数と向きを変える", "回る速さと向きを分けて見よう。");
+    const section = core.section(view.panel, "乾電池の数と向きを変える", "回路の中の乾電池と、モーターの矢印をつなげて見よう。");
     const batteries = core.range(section, { label: "乾電池の数", min: 1, max: 2, value: state.batteries, format: value => value + "個", onInput: value => { state.batteries = value; draw(); } });
-    const direction = core.options(section, { label: "乾電池の向き", values: [option("normal", "基準の向き"), option("reverse", "1個を反対")], value: state.direction, format: item => item.label, onChange: value => { state.direction = value; draw(); } });
+    const direction = core.options(section, { label: "乾電池の向き", values: [option("normal", "同じ向き"), option("reverse", "1個を反対")], value: state.direction, format: item => item.label, onChange: value => { state.direction = value; draw(); } });
     function draw() {
       const effective = state.direction === "reverse" ? (state.batteries === 1 ? -1 : state.batteries - 2) : state.batteries;
       const speed = Math.abs(effective) * 35;
-      const rotation = effective > 0 ? "正向き" : effective < 0 ? "反対向き" : "停止";
-      const cells = Array.from({ length: state.batteries }, (_, i) => {
+      const rotation = effective > 0 ? "右回り" : effective < 0 ? "左回り" : "停止";
+      const cellX = state.batteries === 1 ? [175] : [135,245];
+      const cells = cellX.map((x, i) => {
         const reversed = state.direction === "reverse" && (state.batteries === 1 || i === state.batteries - 1);
-        const top = reversed ? "−" : "+", bottom = reversed ? "+" : "−";
-        return '<g transform="translate(' + (120 + i * 105) + ' 210)"><rect x="0" y="0" width="64" height="82" rx="8" fill="#f5d979" stroke="#9a7726" stroke-width="3"/><text x="23" y="32" class="component-label">' + top + '</text><text x="23" y="66" class="component-label">' + bottom + '</text></g>';
+        return '<g transform="translate(' + x + ' 246)"><rect width="74" height="46" rx="8" fill="#f5d979" stroke="#9a7726" stroke-width="3"/><line x1="' + (reversed ? 55 : 14) + '" y1="8" x2="' + (reversed ? 55 : 14) + '" y2="38" stroke="#725715" stroke-width="6"/><line x1="' + (reversed ? 17 : 54) + '" y1="14" x2="' + (reversed ? 17 : 54) + '" y2="32" stroke="#725715" stroke-width="3"/><text x="' + (reversed ? 48 : 5) + '" y="4" class="tiny-label">＋</text><text x="' + (reversed ? 8 : 48) + '" y="4" class="tiny-label">−</text></g>';
       }).join("");
-      const arrow = effective === 0 ? '<text x="465" y="150" class="component-label">停止</text>' : '<path d="' + (effective > 0 ? "M475 145 Q510 105 545 145" : "M545 145 Q510 105 475 145") + '" fill="none" stroke="#bd8a12" stroke-width="7"/><path d="' + (effective > 0 ? "M536 132 l12 13 -17 5" : "M484 132 l-12 13 17 5") + '" fill="none" stroke="#bd8a12" stroke-width="6"/>';
+      const arrow = effective === 0 ? '<line x1="488" y1="165" x2="548" y2="165" stroke="#8b9694" stroke-width="8"/><text x="488" y="114" class="component-label">打ち消し合って停止</text>' : '<path d="' + (effective > 0 ? "M480 157 A38 38 0 1 1 540 132" : "M548 157 A38 38 0 1 0 488 132") + '" fill="none" stroke="#bd8a12" stroke-width="7" marker-end="url(#motorArrow)"/>';
+      const circuitColor = effective === 0 ? "#7e918d" : "#bd8a12";
       view.stage.innerHTML =
-        '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="乾電池の数と向きによるモーターの変化">' +
-          '<rect width="640" height="360" fill="#f7f5e9"/><text x="28" y="42" class="scene-title">モーターの速さと向き</text><path d="M70 90 H570 V200 H70 Z" fill="none" stroke="#5f807b" stroke-width="5" stroke-linejoin="round"/>' + cells +
-          '<circle cx="510" cy="145" r="48" fill="#e7ece6" stroke="#6c837d" stroke-width="5"/>' + arrow + '<text x="470" y="225" class="component-label">モーター</text>' +
-          '<text x="85" y="315" class="scene-caption">速さ ' + speed + ' / 70　回転：' + rotation + '</text></svg>';
+        '<svg class="extra-svg motor-circuit-diagram" viewBox="0 0 640 360" role="img" aria-label="乾電池の数と向きによってモーターの速さや回る向きが変わる回路">' +
+          '<defs><marker id="motorArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#bd8a12"/></marker></defs><rect width="640" height="360" fill="#f7f5e9"/><text x="28" y="38" class="scene-title">乾電池の向き → モーターの回り方</text><text x="30" y="74" class="scene-caption">回路を一周たどり、＋と−の向きを見よう</text>' +
+          '<path d="M90 220 V115 H470 M550 205 V315 H90 V220" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M470 115 V125 M550 205 V205" stroke="' + circuitColor + '" stroke-width="7"/>' +
+          cells + '<g><circle cx="510" cy="165" r="48" fill="#e7ece6" stroke="#6c837d" stroke-width="5"/><circle cx="510" cy="165" r="11" fill="#6c837d"/><path d="M510 154 l-17 -25 M510 154 l17 -25 M510 176 l-17 25 M510 176 l17 25" stroke="#8ca09b" stroke-width="8" stroke-linecap="round"/>' + arrow + '<text x="474" y="236" class="component-label">モーター</text></g>' +
+          '<g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '　速さ ' + speed + ' / 70</text></g>' +
+        '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
-          { label: "乾電池", value: state.batteries + "個", detail: state.direction === "reverse" ? "反対向きを含む" : "同じ向き" },
+          { label: "乾電池", value: state.batteries + "個", detail: state.direction === "reverse" ? "1個を反対向き" : "＋と−を同じ向きにそろえる" },
           { label: "モーター", value: rotation, detail: "速さ " + speed + " / 70" }
         ],
-        message: state.batteries === 1 && state.direction === "reverse" ? "乾電池1個の向きを反対にすると、回る向きが反対になります。" : effective === 0 ? "乾電池2個を反対向きにつなぐと、働きが打ち消し合って止まるモデルです。" : "同じ向きの乾電池を増やすと、モーターは速く回ります。"
+        message: state.batteries === 1 && state.direction === "reverse" ? "乾電池1個の向きを反対にすると、モーターの回る向きも反対になります。" : effective === 0 ? "2個の乾電池を反対向きにつなぐと、はたらきが打ち消し合うモデルです。" : "同じ向きの乾電池を増やすと、モーターは同じ向きに速く回ります。"
       });
     }
     return {
