@@ -135,6 +135,7 @@
             ${window.SCIENCE_UNITS.map((unit, index) => `<button class="home-compact-card home-unit-card" data-unit="${unit.id}" style="${unitStyle(unit)}"><span class="home-compact-icon unit-icon" aria-hidden="true">${unit.icon}</span><span><strong>${unit.title}</strong><small>UNIT ${index + 1}・${unitPercent(unit)}%</small></span><i>›</i></button>`).join("")}
           </div>
         </section>
+        ${window.ScienceGame ? window.ScienceGame.panel() : ""}
         ${collectionStripMarkup()}
       </section>`;
   }
@@ -493,5 +494,4 @@
   window.addEventListener("hashchange", render);
   render();
 })();
-
 
