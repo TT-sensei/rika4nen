@@ -394,3 +394,6 @@ main.lab-main { width: min(1400px, calc(100% - 28px)); }
 body{background:radial-gradient(circle at 95% 0,#f7d8e5 0 14rem,transparent 14rem),var(--canvas)}
 .hero{background:linear-gradient(125deg,var(--dark),#b45d7d)}
 button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
+
+/* Apply grade color to navigation and cards */
+:root{--grade-accent:#b9587a;--grade-deep:#71334f;--grade-soft:#f8dce7;--grade-card:#fff8fa} .site-header,.header-bar{background:var(--grade-deep)!important}.unit-card,.lab-card,.asset-card,.home-collection-badge,.phase-tab,.activity-card,.activity-nav,.unit-banner{border-color:#e8c6d3;background:var(--grade-card)}.unit-card:hover,.lab-card:hover,.asset-card:hover{border-color:var(--grade-accent)}.primary-button,.tab-button.active,.phase-tab[aria-selected="true"]{background:var(--grade-accent)!important;border-color:var(--grade-accent)!important}.unit-banner{border-top-color:var(--grade-accent)}
