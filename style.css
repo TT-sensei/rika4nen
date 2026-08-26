@@ -426,3 +426,6 @@ button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
 @keyframes waterSoak{to{stroke-dashoffset:-26}}
 @keyframes waterRunoff{to{stroke-dashoffset:-46}}
 @media(prefers-reduced-motion:reduce){.circuit-diagram .circuit-charge,.rainwater-diagram .soak-arrow,.rainwater-diagram .runoff-arrow{animation:none}}
+
+.instant-lab .sim-stage svg[aria-label^="月の形"] .scene-title,
+.instant-lab .sim-stage svg[aria-label^="月の形"] .scene-caption{fill:#eef4ff}
