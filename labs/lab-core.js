@@ -10,10 +10,21 @@
       '<section class="lab-screen instant-lab" style="--lab-accent:' + esc(manifest.accent || "#2a8068") + '">' +
         '<nav class="breadcrumbs" aria-label="現在位置"><button class="text-button" type="button" data-lab-home>シミュレーション一覧</button><span>›</span><span>' + esc(manifest.title) + '</span></nav>' +
         '<header class="lab-titlebar"><div><p class="eyebrow">SIMULATION LAB / ' + esc(manifest.unit) + '</p><h1>' + esc(manifest.title) + '</h1><p>' + esc(manifest.summary) + '</p></div><button class="secondary-button lab-back" type="button" data-lab-home>一覧へ戻る</button></header>' +
-        '<div class="lab-workspace"><section class="simulation-column" aria-label="シミュレーション"><div class="sim-stage" data-sim-stage></div><div class="sim-readout" data-sim-readout aria-live="polite"></div><div class="sim-actions" data-sim-actions></div></section><aside class="control-panel instant-panel" aria-label="条件操作"><div class="control-heading"><p class="eyebrow">TRY IT</p><h2>条件を変えてみよう</h2><p>動かすと、図と結果がすぐ変わります。</p></div><div data-control-panel></div></aside></div>' +
+        '<div class="lab-workspace"><section class="simulation-column" aria-label="シミュレーション"><div class="sim-stage" data-sim-stage></div><div class="sim-readout" data-sim-readout aria-live="polite"></div><div class="sim-actions" data-sim-actions></div></section><aside class="control-panel instant-panel" aria-label="条件操作"><div class="control-heading"><p class="eyebrow">TRY IT</p><h2>条件を変えてみよう</h2><p>動かすと、図と結果がすぐ変わります。</p></div><div data-control-panel></div><section class="trial-panel" aria-labelledby="trialTitle"><div class="trial-heading"><h3 id="trialTitle">くらべた結果</h3><button type="button" data-clear-trials>消す</button></div><div class="trial-list" data-trial-list><p>「この結果をくらべる」で3回分を並べられます。</p></div></section></aside></div>' +
         '<p class="model-note" data-model-note></p></section>';
     const view = root.querySelector(".lab-screen");
+    const stage = view.querySelector("[data-sim-stage]");
     const cleanups = [];
+    let sceneTimer = 0;
+    const sceneObserver = new MutationObserver(() => {
+      stage.classList.remove("is-changing");
+      void stage.offsetWidth;
+      stage.classList.add("is-changing");
+      window.clearTimeout(sceneTimer);
+      sceneTimer = window.setTimeout(() => stage.classList.remove("is-changing"), 360);
+    });
+    sceneObserver.observe(stage, { childList: true });
+    cleanups.push(() => { sceneObserver.disconnect(); window.clearTimeout(sceneTimer); });
     const on = (target, event, handler, options) => {
       if (!target) return handler;
       target.addEventListener(event, handler, options);
@@ -21,13 +32,71 @@
       return handler;
     };
     view.querySelectorAll("[data-lab-home]").forEach(button => on(button, "click", () => onHome && onHome()));
+    const challenges = Array.isArray(manifest.challenges) ? manifest.challenges : [];
+    if (challenges.length) {
+      const mission = document.createElement("section");
+      mission.className = "discovery-mission";
+      mission.innerHTML = '<div class="mission-heading"><span aria-hidden="true">🔎</span><div><small>はっけんミッション</small><b data-mission-text>' + esc(challenges[0]) + '</b></div></div><div class="mission-dots" role="group" aria-label="ミッションを選ぶ">' +
+        challenges.map((item, index) => '<button type="button" aria-pressed="' + (index === 0) + '" data-mission-index="' + index + '">' + (index + 1) + '</button>').join("") + '</div>';
+      const controlArea = view.querySelector("[data-control-panel]");
+      controlArea.insertAdjacentElement("afterend", mission);
+      mission.querySelectorAll("[data-mission-index]").forEach(button => on(button, "click", () => {
+        mission.querySelectorAll("[data-mission-index]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+        mission.querySelector("[data-mission-text]").textContent = challenges[Number(button.dataset.missionIndex)];
+      }));
+    }
+    on(stage, "pointerdown", event => {
+      const rect = stage.getBoundingClientRect();
+      const spark = document.createElement("span");
+      spark.className = "stage-touch-spark";
+      spark.style.left = (event.clientX - rect.left) + "px";
+      spark.style.top = (event.clientY - rect.top) + "px";
+      stage.append(spark);
+      window.setTimeout(() => spark.remove(), 520);
+    });
+    const trialList = view.querySelector("[data-trial-list]");
+    let trialDraft = null;
+    let trials = [];
+    const renderTrials = () => {
+      trialList.innerHTML = trials.length ? trials.map((trial, index) =>
+        '<article><span>' + (trials.length - index) + '</span><div><b>' + esc(trial.condition) + '</b><small>' + esc(trial.result) + '</small></div></article>'
+      ).join("") : '<p>「この結果をくらべる」で3回分を並べられます。</p>';
+    };
+    const makeSnapshot = () => {
+      const conditions = [];
+      view.querySelectorAll(".range-control").forEach(row => {
+        const label = row.querySelector("span");
+        const output = row.querySelector("output");
+        if (label && output) conditions.push(label.childNodes[0].textContent.trim() + " " + output.textContent.trim());
+      });
+      view.querySelectorAll(".segmented-control").forEach(row => {
+        const label = row.querySelector(":scope > span");
+        const selected = row.querySelector('button[aria-pressed="true"]');
+        if (label && selected) conditions.push(label.textContent.trim() + " " + selected.textContent.trim());
+      });
+      const results = Array.from(view.querySelectorAll(".instant-metric")).map(metric => {
+        const label = metric.querySelector("span");
+        const value = metric.querySelector("b");
+        return label && value ? label.textContent.trim() + " " + value.textContent.trim() : "";
+      }).filter(Boolean);
+      return { condition: conditions.join("・") || "いまの条件", result: results.join("・") || "図の変化を観察" };
+    };
+    on(view.querySelector("[data-clear-trials]"), "click", () => { trials = []; renderTrials(); });
     return {
       root: view,
-      stage: view.querySelector("[data-sim-stage]"),
+      stage,
       readout: view.querySelector("[data-sim-readout]"),
       actions: view.querySelector("[data-sim-actions]"),
       panel: view.querySelector("[data-control-panel]"),
       note: view.querySelector("[data-model-note]"),
+      setTrial: trial => { trialDraft = trial; },
+      saveTrial: () => {
+        const trial = trialDraft || makeSnapshot();
+        trials = [trial, ...trials].slice(0, 3);
+        renderTrials();
+        trialDraft = null;
+        return true;
+      },
       on: on,
       destroy: () => {
         cleanups.splice(0).forEach(cleanup => cleanup());
