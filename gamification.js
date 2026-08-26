@@ -11,13 +11,13 @@
   };
   const ICONS={living:"🐞",plants:"🌱",insects:"🦋",windrubber:"💨",sound:"🔔",sun:"☀️",light:"🪞",electricity:"💡",magnets:"🧲",weight:"⚖️",seasons:"🌸",body:"💪",weather:"🌤️",rainwater:"🌧️",moonstars:"🌙",airwater:"💨",volume:"🌡️",heating:"🔥",waterstate:"🧊",animals:"🐟",river:"🏞️",solutions:"🧪",electromagnet:"🧲",burning:"🔥",environment:"🕸️",moon:"🌗",earth:"🌋",lever:"⚖️"};
   const BADGES={"seasons":"life-science","body":"life-science","weather":"earth-science","rainwater":"earth-science","moonstars":"earth-science","electricity":"energy","airwater":"matter","volume":"matter","heating":"energy","waterstate":"matter"};
-  const BADGE_BASE="https://tt-sensei.github.io/edu-assets/assets/badges/science/";
+  const BADGE_BASE="https://tt-sensei.github.io/edu-assets/assets/web/badges/science/";
   const empty = () => ({xp:0, discoveries:{}, rewards:{}, rank:0});
   let state; try { state = {...empty(), ...JSON.parse(localStorage.getItem(KEY))}; } catch (_) { state=empty(); }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (_) {} };
   const rank = () => { let i=0; RANKS.forEach((r,n)=>{if(state.xp>=r[1]) i=n;}); return i; };
   const next = () => RANKS[rank()+1] || null;
-  const info = () => ({xp:state.xp, rank:rank(), name:RANKS[rank()][0], next, discoveries:Object.keys(state.discoveries).length, total:Object.keys(FACTS[grade]||{}).length*4});
+  const info = () => ({xp:state.xp, rank:rank(), name:RANKS[rank()][0], next:next(), discoveries:Object.keys(state.discoveries).length, total:Object.keys(FACTS[grade]||{}).length*4});
   const esc = v => String(v).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
   function overlay(title, body, kind="discovery") { const el=document.createElement("div"); el.className=`science-overlay ${kind}`; el.innerHTML=`<div class="science-pop" role="dialog" aria-modal="true"><p>${kind === "rank" ? "RANK UP!" : kind === "major" ? "★ 大発見！" : "🔍 NEW DISCOVERY!"}</p><h2>${esc(title)}</h2><div>${esc(body)}</div><button type="button">やった！</button></div>`; el.querySelector("button").onclick=()=>el.remove(); document.body.append(el); }
   function tone() { try { const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain(); o.frequency.value=880;g.gain.setValueAtTime(.06,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.28);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.28); } catch(_){} }
@@ -41,7 +41,7 @@
         items.push(`<article class="discovery-card ${got?"found":"hidden"}"><span>${got?"🔍":"？"}</span><b>${got?esc(got.title):phaseLabels[phase]}</b><small>${got?esc(got.text):"この単元の学習を進めると見つかるよ"}</small></article>`);
       });
       const got=state.discoveries[`major.${id}`], icon=ICONS[id]||"🔬";
-      items.push(`<article class="discovery-card ${got?"found":"hidden"}">${got&&BADGES[id]?`<img class="discovery-badge" src="${BADGE_BASE}${BADGES[id]}/badge.png" alt="">`:`<span>${got?icon:"？"}</span>`}<b>${got?"大発見":"大発見（未発見）"}</b><small>${got?esc(fact):"単元を最後まで進めると見つかるよ"}</small></article>`);
+      items.push(`<article class="discovery-card ${got?"found":"hidden"}">${got&&BADGES[id]?`<img class="discovery-badge" src="${BADGE_BASE}${BADGES[id]}/badge.webp" alt="">`:`<span>${got?icon:"？"}</span>`}<b>${got?"大発見":"大発見（未発見）"}</b><small>${got?esc(fact):"単元を最後まで進めると見つかるよ"}</small></article>`);
     });
     return `<section class="catalog-page"><button class="text-button" data-home>単元一覧へ</button><p class="eyebrow">DISCOVERY BOOK</p><h1>発見図鑑　${info().discoveries} / ${info().total}</h1><p>知識・実験計画・考察・大発見を集めよう。大発見には特別なバッジがつくよ。</p><div class="discovery-grid">${items.join("")}</div></section>`;
   }
