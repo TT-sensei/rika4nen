@@ -1,6 +1,18 @@
 (() => {
   "use strict";
-  const k=(id,prompt,pair,choices,answer,explanation)=>({id,prompt,pair,choices,answer,explanation});
+  // 基本問題は「くらべる情報」を付け、追加問題は短い書式で登録できる。
+  // どちらの形でも、問題画面が同じデータ構造を受け取れるようにする。
+  const k=(id,prompt,pairOrChoices,choicesOrAnswer,answerOrExplanation,maybeExplanation)=>{
+    const hasPair=Array.isArray(choicesOrAnswer);
+    return {
+      id,
+      prompt,
+      pair:hasPair ? pairOrChoices : null,
+      choices:hasPair ? choicesOrAnswer : pairOrChoices,
+      answer:hasPair ? answerOrExplanation : choicesOrAnswer,
+      explanation:hasPair ? maybeExplanation : answerOrExplanation
+    };
+  };
   const p=(id,title,prediction,lead,buckets,cards,explanation)=>({id,title,prediction,lead,buckets,cards,explanation});
   const c=(id,prompt,evidence,choices,answer,explanation)=>({id,prompt,evidence,choices,answer,explanation});
   const buckets=(a,b)=>[{id:"a",label:a},{id:"b",label:b}];
