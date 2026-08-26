@@ -201,7 +201,7 @@
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="月と星の見え方のシミュレーション">' +
           '<rect width="640" height="360" fill="#17264c"/>' + stars + '<circle cx="545" cy="66" r="28" fill="#f5cb57"/><text x="28" y="42" fill="#eef4ff" class="scene-title">空の見え方を動かそう</text>' +
           '<path d="M90 280 Q320 90 570 280" fill="none" stroke="#6677a8" stroke-width="2" stroke-dasharray="7 8"/>' +
-          (state.target === "moon" ? moon + '<text x="28" y="82" fill="#dce8ff" class="scene-caption">月の形：' + phase + '</text>' : stars + '<text x="28" y="82" fill="#dce8ff" class="scene-caption">星座は並び方を保って動いて見える</text>') +
+          (state.target === "moon" ? moon + '<text x="28" y="82" fill="#dce8ff" class="scene-caption">月の形：' + phase + '</text>' : '<text x="28" y="82" fill="#dce8ff" class="scene-caption">星座は並び方を保って動いて見える</text>') +
           '<text x="255" y="328" fill="#dce8ff" class="component-label">東</text><text x="480" y="328" fill="#dce8ff" class="component-label">西</text>' +
         '</svg>';
       core.renderReadout(view.readout, {
