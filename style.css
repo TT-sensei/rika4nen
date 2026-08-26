@@ -388,3 +388,9 @@ main.lab-main { width: min(1400px, calc(100% - 28px)); }
   .burn-flame,.air-in,.air-out,.gas-bubble,.reaction-bubble,
   .blood-path,.body-dot,.plant-water-dot,.plant-mist{animation:none!important}
 }
+
+/* Grade theme: 4th grade / warm pink */
+:root{--ink:#4a2738;--muted:#806574;--canvas:#fcf0f5;--main:#b9587a;--dark:#71334f;--pale:#f8dce7;--blue:#8d5c9e;--line:#e7cbd6;--shadow:0 10px 28px rgba(113,51,79,.13)}
+body{background:radial-gradient(circle at 95% 0,#f7d8e5 0 14rem,transparent 14rem),var(--canvas)}
+.hero{background:linear-gradient(125deg,var(--dark),#b45d7d)}
+button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
