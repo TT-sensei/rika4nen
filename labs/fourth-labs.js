@@ -11,7 +11,10 @@
     view.note.textContent = manifest.modelNote || "";
     const model = create(view, core);
     core.action(view.actions, "リセット", () => model.reset());
-    core.action(view.actions, "1つ進める", () => model.step());
+    core.action(view.actions, model.stepLabel || "条件を1つ進める", () => model.step());
+    core.action(view.actions, "この結果をくらべる", () => {
+      if (view.saveTrial()) host.showToast && host.showToast("結果を右側にのこしました");
+    }, "primary-button");
     model.render();
     return () => {
       model.destroy && model.destroy();
