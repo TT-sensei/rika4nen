@@ -8,7 +8,7 @@
     ["science-discovery","科学の発見"],["science-connection","つながり"],["life-science","生命"],["earth-science","地球・天気"],
     ["matter","物質"],["energy","エネルギー"]
   ];
-  const elements = ["fire","water","nature","thunder","ice","wind","earth","light","moon","crystal","shadow","gravity","cosmos","psychic","sound","rainbow","dream","bubble","cloud","flower","fairy","candy","rain"];
+  const elements = ["fire","water","nature","thunder","ice","wind","earth","light","moon","heart","shadow","gravity","cosmos","psychic","sound","rainbow","dream","bubble","cloud","flower","fairy","candy","rain"];
   const collections = ["animal","sea-animal","fruit","gem","dinosaur","space","fantasy","insect","treasure","flower"];
   const KEY = "rikaLabAssets" + grade + ".v1";
   let state = {}; try { state = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (_) {}
