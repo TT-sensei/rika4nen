@@ -26,7 +26,7 @@ LABでは、スライダーや選択ボタンを動かすと、図と結果が�
 | もののあたたまり方 | 物の種類と熱する時間を変え、熱の伝わり方を見る |
 | 水のすがたと温度 | 温度を変え、氷・水・水蒸気の変化を見る |
 
-## 問題学習
+## 問題学習と学習記録
 
 問題は、4年生の「関係付けて考える」学びに合わせて、次の3段階で構成しています。
 
@@ -84,6 +84,20 @@ rika4nen/
 - [Concord Consortium STEM Models & Simulations](https://concord.org/our-work/focus-areas/stem-models-simulations/)
 
 外部の参考プロジェクトから、直接操作、条件変更、現象の可視化という考え方を学び、小学校4年生の内容に合わせて独自に実装しています。コード、文章、画像、画面デザインをそのまま転載していません。
+
+## ライセンス・利用について
+
+学校・家庭での学習目的で無料で利用できます。
+
+このリポジトリのコードおよびTT-senseiオリジナルの教材・画像を、許可なく有料教材、有料サービス、販売商品として利用することはできません。アプリを複製して別サービスとして販売すること、オリジナル素材を素材集として再配布・販売することも許可していません。
+
+外部ライブラリ、フォント、音源、画像、データ等の第三者素材には、それぞれの権利者・ライセンス・利用条件が適用されます。
+
+Software code and original educational content in this repository are licensed under the PolyForm Noncommercial License 1.0.0.
+
+https://polyformproject.org/licenses/noncommercial/1.0.0/
+
+Copyright © 2026 TT-sensei.
 
 ## 公開ページ
 
