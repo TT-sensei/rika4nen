@@ -41,7 +41,7 @@
       const light = clamp((state.daylight - 8) / 8, 0, 1);
       const growth = clamp(warmth * .65 + light * .35, 0, 1);
       const leaves = Math.round(2 + growth * 10);
-      const activity = Math.round(1 + warmth * 9);
+      const activity = Math.round(1 + warmth * 6 + light * 3);
       const leafMarks = Array.from({ length: leaves }, (_, i) => {
         const x = 306 + (i % 2) * 52 + Math.floor(i / 2) * 3;
         const y = 265 - Math.floor(i / 2) * 23 - (i % 2) * 5;
@@ -64,7 +64,7 @@
           { label: "気温・昼", value: state.temp + "℃・" + state.daylight + "時間", detail: "季節の条件" },
           { label: state.target === "plant" ? "葉・花" : "活動", value: state.target === "plant" ? leaves + "枚ほど" : activity + " / 10", detail: "モデルの目安" }
         ],
-        message: state.target === "plant" ? "植物の変化には、気温と昼の長さの両方が関係するモデルです。" : "動物の活動は気温だけで決まらず、食べ物やすみかにも関係します。"
+        message: state.target === "plant" ? "植物の変化には、気温と昼の長さの両方が関係するモデルです。" : "このモデルでは気温と昼の長さで活動の目安が変わります。実際には食べ物やすみかにも関係します。"
       });
     }
     return {
@@ -278,7 +278,7 @@
           '<defs><marker id="motorArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#bd8a12"/></marker></defs><rect width="640" height="360" fill="#f7f5e9"/><text x="28" y="38" class="scene-title">乾電池の向き → モーターの回り方</text><text x="30" y="74" class="scene-caption">回路を一周たどり、＋と−の向きを見よう</text>' +
           '<path d="M90 220 V115 H470 M550 205 V315 H90 V220" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M470 115 V125 M550 205 V205" stroke="' + circuitColor + '" stroke-width="7"/>' +
           cells + '<g><circle cx="510" cy="165" r="48" fill="#e7ece6" stroke="#6c837d" stroke-width="5"/><circle cx="510" cy="165" r="11" fill="#6c837d"/><path d="M510 154 l-17 -25 M510 154 l17 -25 M510 176 l-17 25 M510 176 l17 25" stroke="#8ca09b" stroke-width="8" stroke-linecap="round"/>' + arrow + '<text x="474" y="236" class="component-label">モーター</text></g>' +
-          '<g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '　速さ ' + speed + ' / 70</text></g>' +
+          '<rect x="465" y="260" width="100" height="12" rx="6" fill="#e0e7e3"/><rect x="465" y="260" width="' + (100 * speed / 70) + '" height="12" rx="6" fill="#bd8a12"/><text x="465" y="291" class="component-label">回転の速さ</text><g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '　速さ ' + speed + ' / 70</text></g>' +
         '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
@@ -302,7 +302,7 @@
     const pressure = core.range(section, { label: "押す強さ", min: 0, max: 100, value: state.pressure, format: value => value + "%", onInput: value => { state.pressure = value; draw(); } });
     function draw() {
       const volume = state.material === "air" ? 100 - state.pressure * .62 : 100 - state.pressure * .03;
-      const resistance = Math.round(state.material === "air" ? state.pressure * (.35 + state.pressure * .0045) : state.pressure);
+      const resistance = Math.round(state.material === "air" ? state.pressure * (.35 + state.pressure * .0065) : state.pressure);
       const innerWidth = volume * 2.7;
       const pistonX = 160 + innerWidth;
       const particleWidth = Math.max(18, innerWidth - 34);
@@ -336,7 +336,7 @@
       const delta = state.temperature - 20;
       const coefficient = { air: .0034, water: .00021, metal: .00005 }[state.material];
       const percent = delta * coefficient * 100;
-      const radius = 43 * clamp(1 + percent / 100, .72, 1.35);
+      const radius = 43 * clamp(1 + percent * .15, .72, 1.35);
       const labels = { air:"空気", water:"水", metal:"金属" };
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="物の温度と体積の変化">' +
@@ -365,7 +365,6 @@
     const material = core.options(section, { label: "物", values: [option("metal", "金属"), option("water", "水"), option("air", "空気")], value: state.material, format: item => item.label, onChange: value => { state.material = value; draw(); } });
     const time = core.range(section, { label: "熱してからの時間", min: 0, max: 10, value: state.time, format: value => value, onInput: value => { state.time = value; draw(); } });
     function draw() {
-      const warm = state.time * 10;
       const isFlow = state.material !== "metal";
       const metalCells = Array.from({length:10}, (_, i) => {
         const reached = i <= state.time - 1;
