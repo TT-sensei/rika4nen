@@ -440,7 +440,7 @@ button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
   body:has(.body-lab) main.lab-main,
   body:has(.plants-lab) main.lab-main,
   body:has(.electricity-lab) main.lab-main,
-  body:has(.burn-lab) main.lab-main,
+  body:has(.burning-lab) main.lab-main,
   body:has(.solutions-lab) main.lab-main {
     width: calc(100% - 24px);
     max-width: 1600px;
@@ -449,6 +449,7 @@ button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
   }
 
   .instant-lab .lab-workspace,
+  .burning-lab ~ main.lab-main,
   .earth-workspace,
   .environment-workspace,
   .body-workspace,
