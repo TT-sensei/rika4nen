@@ -371,7 +371,7 @@
         const reached = i <= state.time - 1;
         return '<rect x="' + (125 + i * 39) + '" y="145" width="39" height="95" fill="' + (reached ? "#dc7655" : "#c8d0ce") + '" opacity="' + (reached ? 1 - i * .045 : .65) + '"/>';
       }).join("");
-      const loops = '<path d="M210 245 C150 185 185 125 270 145 C350 165 355 235 285 250" fill="none" stroke="#4b94ae" stroke-width="8" stroke-dasharray="12 9" opacity="' + (state.time / 10) + '"/><path d="M430 245 C370 185 405 125 490 145 C550 165 555 225 500 250" fill="none" stroke="#d27b58" stroke-width="8" stroke-dasharray="12 9" opacity="' + (state.time / 10) + '"/>';
+      const loops = '<defs><marker id="heatArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#4b94ae"/></marker></defs><path d="M210 245 C150 185 185 125 270 145 C350 165 355 235 285 250" fill="none" stroke="#4b94ae" stroke-width="8" stroke-dasharray="12 9" marker-end="url(#heatArrow)" opacity="' + (state.time / 10) + '"/><path d="M430 245 C370 185 405 125 490 145 C550 165 555 225 500 250" fill="none" stroke="#d27b58" stroke-width="8" stroke-dasharray="12 9" marker-end="url(#heatArrow)" opacity="' + (state.time / 10) + '"/>';
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="物の温まり方">' +
           '<rect width="640" height="360" fill="#fff3ed"/><text x="28" y="42" class="scene-title">熱はどのように広がる？</text><text x="30" y="80" class="scene-caption">' + ({metal:"金属",water:"水",air:"空気"}[state.material]) + '　時間 ' + state.time + '</text>' +
