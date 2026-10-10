@@ -449,7 +449,6 @@ button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
   }
 
   .instant-lab .lab-workspace,
-  .burning-lab ~ main.lab-main,
   .earth-workspace,
   .environment-workspace,
   .body-workspace,
