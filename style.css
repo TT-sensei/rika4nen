@@ -429,3 +429,154 @@ button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
 
 .instant-lab .sim-stage svg[aria-label^="月の形"] .scene-title,
 .instant-lab .sim-stage svg[aria-label^="月の形"] .scene-caption{fill:#eef4ff}
+
+
+/* Tablet-first LAB layout: full-width experiment first, controls underneath.
+   Keep the page scrollable rather than shrinking the experiment to fit the viewport. */
+@media (min-width: 761px) and (max-width: 1366px) {
+  body:has(.instant-lab) main.lab-main,
+  body:has(.earth-lab) main.lab-main,
+  body:has(.environment-lab) main.lab-main,
+  body:has(.body-lab) main.lab-main,
+  body:has(.plants-lab) main.lab-main,
+  body:has(.electricity-lab) main.lab-main,
+  body:has(.burning-lab) main.lab-main,
+  body:has(.solutions-lab) main.lab-main {
+    width: calc(100% - 24px);
+    max-width: 1600px;
+    padding-top: 10px;
+    padding-bottom: 28px;
+  }
+
+  .instant-lab .lab-workspace,
+  .earth-workspace,
+  .environment-workspace,
+  .body-workspace,
+  .plants-workspace,
+  .electricity-workspace,
+  .burn-workspace,
+  .solutions-workspace {
+    display: grid;
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .instant-lab .simulation-column,
+  .earth-stage-wrap,
+  .environment-stage-wrap,
+  .body-stage-wrap,
+  .plant-stage-wrap,
+  .electricity-stage-wrap,
+  .burn-stage,
+  .solutions-stage {
+    width: 100%;
+    min-width: 0;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .instant-lab .sim-stage {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 0;
+  }
+
+  .instant-lab .sim-stage svg,
+  .instant-lab .extra-svg,
+  .earth-svg,
+  .environment-svg,
+  .body-svg,
+  .plant-svg,
+  .electricity-svg,
+  .burning-svg,
+  .solutions-svg {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    min-width: 0;
+    min-height: 0;
+    max-width: none !important;
+    max-height: none !important;
+  }
+
+  .instant-lab .instant-panel,
+  .instant-lab .control-panel,
+  .earth-panel,
+  .environment-panel,
+  .body-panel,
+  .plants-panel,
+  .electricity-panel,
+  .burn-panel,
+  .solutions-panel {
+    width: 100%;
+    height: auto !important;
+    min-width: 0;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: clamp(16px, 2.5vw, 30px);
+  }
+
+  .instant-lab .sim-readout {
+    padding: 16px clamp(14px, 2.5vw, 30px);
+  }
+
+  .instant-lab .extra-readout-grid,
+  .instant-lab .instant-readout-grid {
+    gap: 10px;
+  }
+
+  .instant-lab .instant-metric {
+    min-height: 72px;
+    padding: 12px 14px;
+  }
+
+  .instant-lab .instant-metric span {
+    font-size: .8rem;
+  }
+
+  .instant-lab .instant-metric b {
+    font-size: 1.12rem;
+  }
+
+  .instant-lab .instant-control,
+  .instant-lab .instant-range {
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .instant-lab .instant-range input {
+    min-height: 36px;
+    height: auto;
+  }
+
+  .instant-lab .instant-options button,
+  .instant-lab .instant-presets button {
+    min-height: 44px;
+    font-size: .82rem;
+  }
+
+  .earth-bottom,
+  .environment-bottom,
+  .body-bottom,
+  .plant-bottom,
+  .electricity-bottom,
+  .burn-record-grid,
+  .solution-record-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 761px) and (max-width: 980px) {
+  .instant-lab .extra-readout-grid,
+  .instant-lab .instant-readout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
