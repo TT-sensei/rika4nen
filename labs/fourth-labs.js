@@ -10,6 +10,7 @@
     const view = core.shell(root, manifest, { onHome: () => host.routeTo("lab") });
     view.note.textContent = manifest.modelNote || "";
     const model = create(view, core);
+    if (model.stageHint) view.stage.dataset.touchHint = model.stageHint;
     if (typeof model.stageTouch === "function" && view.setStageTouchAction) {
       view.setStageTouchAction(() => model.stageTouch());
     }
@@ -72,8 +73,11 @@
     }
     return {
       render: draw,
+      stageHint: "タッチして気温を変えよう",
+      stepLabel: "🌡️ 気温を変える",
       reset: () => { state.temp = 18; state.daylight = 12; state.target = "plant"; temp.set(state.temp); daylight.set(state.daylight); target.set(state.target); draw(); },
-      step: () => { state.temp = state.temp >= 28 ? 7 : state.temp + 5; state.daylight = state.temp < 10 ? 9 : state.temp > 23 ? 15 : 12; temp.set(state.temp); daylight.set(state.daylight); draw(); }
+      step: () => { state.temp = state.temp >= 28 ? 7 : state.temp + 5; state.daylight = state.temp < 10 ? 9 : state.temp > 23 ? 15 : 12; temp.set(state.temp); daylight.set(state.daylight); draw(); },
+      stageTouch: () => { state.temp = state.temp >= 28 ? 5 : Math.min(30, state.temp + 5); temp.set(state.temp); draw(); }
     };
   }
 
@@ -112,8 +116,11 @@
     }
     return {
       render: draw,
+      stageHint: "タッチして腕を曲げ伸ばし",
+      stepLabel: "💪 腕を動かす",
       reset: () => { state.angle = 75; angle.set(state.angle); draw(); },
-      step: () => { state.angle = state.angle >= 120 ? 0 : state.angle + 30; angle.set(state.angle); draw(); }
+      step: () => { state.angle = state.angle >= 120 ? 0 : state.angle + 30; angle.set(state.angle); draw(); },
+      stageTouch: () => { state.angle = state.angle >= 120 ? 0 : state.angle + 30; angle.set(state.angle); draw(); }
     };
   }
 
@@ -154,8 +161,11 @@
     }
     return {
       render: draw,
+      stageHint: "タッチして時刻を進めよう",
+      stepLabel: "🕒 時刻を進める",
       reset: () => { state.weather = "sunny"; state.time = 12; weatherControl.set(state.weather); time.set(state.time); draw(); },
-      step: () => { state.time = state.time >= 20 ? 6 : state.time + 2; time.set(state.time); draw(); }
+      step: () => { state.time = state.time >= 20 ? 6 : state.time + 2; time.set(state.time); draw(); },
+      stageTouch: () => { state.time = state.time >= 20 ? 6 : state.time + 2; time.set(state.time); draw(); }
     };
   }
 
@@ -200,6 +210,8 @@
     return {
       render: draw,
       reset: () => { state.slope = 55; state.ground = "sand"; slope.set(state.slope); ground.set(state.ground); draw(); },
+      stageHint: "タッチして地面の傾きを変えよう",
+      stepLabel: "🌧️ 傾きを変える",
       step: () => { state.slope = state.slope >= 100 ? 0 : Math.min(100, state.slope + 20); slope.set(state.slope); draw(); },
       stageTouch: () => { state.slope = state.slope >= 100 ? 0 : Math.min(100, state.slope + 25); slope.set(state.slope); draw(); }
     };
@@ -256,8 +268,11 @@
     toggleControls();
     return {
       render: draw,
+      stageHint: "タッチして月や星の変化を見よう",
+      stepLabel: "🌙 次のようすを見る",
       reset: () => { state.time = 20; state.day = 15; state.target = "position"; time.set(state.time); day.set(state.day); target.set(state.target); toggleControls(); draw(); },
-      step: () => { if (state.target === "phase") { state.day = state.day >= 28 ? 1 : state.day + 3; day.set(state.day); } else { state.time = state.time >= 24 ? 18 : state.time + 1; time.set(state.time); } draw(); }
+      step: () => { if (state.target === "phase") { state.day = state.day >= 28 ? 1 : state.day + 3; day.set(state.day); } else { state.time = state.time >= 24 ? 18 : state.time + 1; time.set(state.time); } draw(); },
+      stageTouch: () => { if (state.target === "phase") { state.day = state.day >= 28 ? 1 : state.day + 3; day.set(state.day); } else { state.time = state.time >= 24 ? 18 : state.time + 1; time.set(state.time); } draw(); }
     };
   }
 
@@ -295,6 +310,8 @@
     return {
       render: draw,
       reset: () => { state.batteries = 1; state.direction = "normal"; batteries.set(state.batteries); direction.set(state.direction); draw(); },
+      stageHint: "タッチして乾電池の向きを変えよう",
+      stepLabel: "🔋 電池の数を変える",
       step: () => { state.batteries = state.batteries >= 2 ? 1 : state.batteries + 1; batteries.set(state.batteries); draw(); },
       stageTouch: () => { state.direction = state.direction === "normal" ? "reverse" : "normal"; direction.set(state.direction); draw(); }
     };
@@ -327,8 +344,11 @@
     }
     return {
       render: draw,
+      stageHint: "タッチして注射器を押そう",
+      stepLabel: "💨 ぎゅっと押す",
       reset: () => { state.material = "air"; state.pressure = 55; material.set(state.material); pressure.set(state.pressure); draw(); },
-      step: () => { state.pressure = state.pressure >= 100 ? 0 : Math.min(100, state.pressure + 20); pressure.set(state.pressure); draw(); }
+      step: () => { state.pressure = state.pressure >= 100 ? 0 : Math.min(100, state.pressure + 20); pressure.set(state.pressure); draw(); },
+      stageTouch: () => { state.pressure = state.pressure >= 100 ? 0 : Math.min(100, state.pressure + 20); pressure.set(state.pressure); draw(); }
     };
   }
 
@@ -359,8 +379,11 @@
     }
     return {
       render: draw,
+      stageHint: "タッチして温度を変えよう",
+      stepLabel: "🌡️ 温度を変える",
       reset: () => { state.material = "air"; state.temperature = 20; material.set(state.material); temperature.set(state.temperature); draw(); },
-      step: () => { state.temperature = state.temperature >= 80 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); }
+      step: () => { state.temperature = state.temperature >= 80 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); },
+      stageTouch: () => { state.temperature = state.temperature >= 80 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); }
     };
   }
 
@@ -391,8 +414,11 @@
     }
     return {
       render: draw,
+      stageHint: "タッチして温まるようすを見よう",
+      stepLabel: "🔥 時間を進める",
       reset: () => { state.material = "metal"; state.time = 4; material.set(state.material); time.set(state.time); draw(); },
-      step: () => { state.time = state.time >= 10 ? 0 : state.time + 2; time.set(state.time); draw(); }
+      step: () => { state.time = state.time >= 10 ? 0 : state.time + 2; time.set(state.time); draw(); },
+      stageTouch: () => { state.time = state.time >= 10 ? 0 : state.time + 2; time.set(state.time); draw(); }
     };
   }
 
@@ -426,6 +452,8 @@
     return {
       render: draw,
       reset: () => { state.temperature = 20; temperature.set(state.temperature); draw(); },
+      stageHint: "タッチして水の温度を変えよう",
+      stepLabel: "🧊 温度を進める",
       step: () => { state.temperature = state.temperature >= 120 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); },
       stageTouch: () => { state.temperature = state.temperature >= 120 ? -20 : Math.min(120, state.temperature + 20); temperature.set(state.temperature); draw(); }
     };

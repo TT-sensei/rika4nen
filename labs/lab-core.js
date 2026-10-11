@@ -14,6 +14,7 @@
         '<p class="model-note" data-model-note></p></section>';
     const view = root.querySelector(".lab-screen");
     const stage = view.querySelector("[data-sim-stage]");
+    stage.dataset.touchHint = manifest.touchHint || "タッチして実験を進めよう";
     const cleanups = [];
     let sceneTimer = 0;
     const sceneObserver = new MutationObserver(() => {
@@ -32,6 +33,7 @@
       return handler;
     };
     view.querySelectorAll("[data-lab-home]").forEach(button => on(button, "click", () => onHome && onHome()));
+    const controlArea = view.querySelector("[data-control-panel]");
     const challenges = Array.isArray(manifest.challenges) ? manifest.challenges : [];
     if (challenges.length) {
       const mission = document.createElement("section");
@@ -44,7 +46,6 @@
         mission.querySelector("[data-mission-text]").textContent = challenges[Number(button.dataset.missionIndex)];
       }));
     }
-    const controlArea = view.querySelector("[data-control-panel]");
     const randomizeRow = row => {
       const range = row.querySelector('input[type="range"]');
       if (range) {
@@ -94,6 +95,7 @@
       spark.style.top = (event.clientY - rect.top) + "px";
       stage.append(spark);
       window.setTimeout(() => spark.remove(), 520);
+      if (event.button !== 0) return;
       if (stageTouchAction) stageTouchAction(event);
       else randomizeOne();
     });
