@@ -85,6 +85,7 @@
     randomButton.setAttribute("aria-label", "実験の条件をランダムに変える");
     on(randomButton, "click", randomizeAll);
     controlArea.insertAdjacentElement("afterend", randomButton);
+    let stageTouchAction = null;
     on(stage, "pointerdown", event => {
       const rect = stage.getBoundingClientRect();
       const spark = document.createElement("span");
@@ -93,7 +94,8 @@
       spark.style.top = (event.clientY - rect.top) + "px";
       stage.append(spark);
       window.setTimeout(() => spark.remove(), 520);
-      randomizeOne();
+      if (stageTouchAction) stageTouchAction(event);
+      else randomizeOne();
     });
     const trialList = view.querySelector("[data-trial-list]");
     let trialDraft = null;
@@ -139,6 +141,7 @@
         return true;
       },
       on: on,
+      setStageTouchAction: handler => { stageTouchAction = typeof handler === "function" ? handler : null; },
       destroy: () => {
         cleanups.splice(0).forEach(cleanup => cleanup());
         view.remove();
