@@ -580,3 +580,11 @@ button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+/* Hands-on discovery: a tap changes one condition; the shuffle button varies all conditions. */
+.instant-lab .sim-stage::after{content:"タッチして条件チェンジ";position:absolute;z-index:2;right:10px;bottom:10px;padding:7px 10px;border:1px solid rgba(255,255,255,.82);border-radius:999px;background:rgba(22,49,61,.78);color:#fff;font-size:.72rem;font-weight:800;letter-spacing:.02em;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.random-experiment-button{display:block;width:100%;min-height:46px;margin-top:12px;padding:10px 14px;border:0;border-radius:13px;background:var(--lab-accent);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 4px 0 color-mix(in srgb,var(--lab-accent) 72%,#172e35);transition:transform .12s,filter .12s}
+.random-experiment-button:hover{filter:brightness(1.06)}.random-experiment-button:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--lab-accent) 72%,#172e35)}
+@media(max-width:760px){.instant-lab .sim-stage::after{right:6px;bottom:6px;padding:5px 8px;font-size:.64rem}.random-experiment-button{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.random-experiment-button{transition:none}}
