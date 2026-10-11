@@ -370,20 +370,23 @@
       const delta = state.temperature - 20;
       const coefficient = { air: .0034, water: .00021, metal: .00005 }[state.material];
       const percent = delta * coefficient * 100;
-      const radius = 43 * clamp(1 + percent * .15, .72, 1.35);
+      // The displayed circle deliberately exaggerates tiny changes so children can compare materials.
+      // The numerical percentage remains a separate, illustrative model value.
+      const visualSensitivity = { air: .009, water: .006, metal: .004 }[state.material];
+      const radius = 43 * clamp(1 + delta * visualSensitivity, .72, 1.55);
       const labels = { air:"空気", water:"水", metal:"金属" };
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="物の温度と体積の変化">' +
           '<defs><linearGradient id="volumeBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff8f2"/><stop offset="1" stop-color="#f8e5dc"/></linearGradient><radialGradient id="volumeAir"><stop offset="0" stop-color="#e6f8ff"/><stop offset="1" stop-color="#83c7df"/></radialGradient><radialGradient id="volumeWater"><stop offset="0" stop-color="#b8e8f0"/><stop offset="1" stop-color="#398fa8"/></radialGradient><linearGradient id="volumeMetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e3e7eb"/><stop offset=".5" stop-color="#929ca5"/><stop offset="1" stop-color="#d2d8dd"/></linearGradient></defs><rect width="640" height="360" fill="url(#volumeBg)"/><text x="28" y="42" class="scene-title">温度を変えると、体積は？</text><text x="30" y="80" class="scene-caption">' + labels[state.material] + '　' + state.temperature + '℃</text>' +
           '<rect x="140" y="120" width="360" height="130" rx="15" fill="#ffffff" fill-opacity=".8" stroke="#bf8b78" stroke-width="4"/><path d="M152 135 H488" stroke="#ffffff" stroke-width="5" opacity=".9"/><circle cx="320" cy="185" r="43" fill="none" stroke="#9eaaa9" stroke-width="3" stroke-dasharray="7 6"/><circle cx="320" cy="185" r="' + radius + '" fill="' + ({air:"url(#volumeAir)",water:"url(#volumeWater)",metal:"url(#volumeMetal)"}[state.material]) + '" stroke="#6f7d82" stroke-width="4" opacity=".96"/><ellipse cx="' + (320-radius*.3) + '" cy="' + (185-radius*.35) + '" rx="' + Math.max(5,radius*.22) + '" ry="' + Math.max(3,radius*.1) + '" fill="#ffffff" opacity=".55"/>' +
-          '<text x="220" y="300" class="component-label">20℃を基準：' + (percent >= 0 ? "+" : "") + one(percent, 2) + '%</text><text x="180" y="330" class="scene-caption">図の変化は見やすく拡大しています</text></svg>';
+          '<text x="220" y="300" class="component-label">20℃を基準：' + (percent >= 0 ? "+" : "") + one(percent, 2) + '%</text><text x="180" y="330" class="scene-caption">円の大きさは変化を強調／数値は別に確認</text></svg>';
       core.renderReadout(view.readout, {
         metrics: [
           { label: "温度", value: state.temperature + "℃", detail: delta > 0 ? "温めた" : delta < 0 ? "冷やした" : "基準" },
           { label: "体積", value: (percent >= 0 ? "+" : "") + one(percent, 2) + "%", detail: labels[state.material] }
         ],
         message: delta === 0 ? "20℃を基準に、温めたり冷やしたりして比べよう。" : delta > 0 ? "この模型では、温めると体積が大きくなります。空気・水・金属で変化の大きさを比べよう。" : "この模型の温度範囲では、冷やすと体積が小さくなるものとして表しています。空気の変化が最も大きい模型です。",
-        note: "温度は10〜80℃の範囲で比べます。円の大きさと数値は違いを見つけやすくした模型上の表現で、実際の体積変化を正確に計算したものではありません。"
+        note: "温度は10〜80℃の範囲で比べます。円の大きさは小さな違いも比べやすいように強調しています。実際の体積変化の大きさは、表示された数値（模型上の目安）で別に確認しましょう。円の大きさと数値は実際の体積変化を正確に再現したものではありません。"
       });
     }
     return {
