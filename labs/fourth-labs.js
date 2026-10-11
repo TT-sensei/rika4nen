@@ -81,7 +81,7 @@
     function draw() {
       const upper = clamp((state.angle + 10) / 130, 0, 1);
       const lower = 1 - upper;
-      const rad = (Math.PI / 180) * (23 + state.angle);
+      const rad = (Math.PI / 180) * (23 - state.angle);
       const elbowX = 360, elbowY = 210;
       const handX = elbowX + Math.cos(rad) * 112;
       const handY = elbowY + Math.sin(rad) * 112;
