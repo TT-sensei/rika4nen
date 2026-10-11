@@ -38,7 +38,7 @@
       mission.className = "discovery-mission";
       mission.innerHTML = '<div class="mission-heading"><span aria-hidden="true">🔎</span><div><small>はっけんミッション</small><b data-mission-text>' + esc(challenges[0]) + '</b></div></div><div class="mission-dots" role="group" aria-label="ミッションを選ぶ">' +
         challenges.map((item, index) => '<button type="button" aria-pressed="' + (index === 0) + '" data-mission-index="' + index + '">' + (index + 1) + '</button>').join("") + '</div>';
-      randomButton.insertAdjacentElement("afterend", mission);
+      controlArea.insertAdjacentElement("afterend", mission);
       mission.querySelectorAll("[data-mission-index]").forEach(button => on(button, "click", () => {
         mission.querySelectorAll("[data-mission-index]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
         mission.querySelector("[data-mission-text]").textContent = challenges[Number(button.dataset.missionIndex)];
