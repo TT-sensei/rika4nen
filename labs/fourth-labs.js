@@ -102,15 +102,15 @@
           '<path d="M245 160 L360 210" fill="none" stroke="#f0c2ac" stroke-width="' + (28 + upperWidth) + '" stroke-linecap="round"/><path d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#f0c2ac" stroke-width="' + (24 + lowerWidth) + '" stroke-linecap="round"/>' +
           '<path d="M250 160 L360 210" fill="none" stroke="#bd5e6b" stroke-width="' + upperWidth + '" stroke-linecap="round"/><path d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#6e94af" stroke-width="' + lowerWidth + '" stroke-linecap="round"/>' +
           '<circle cx="360" cy="210" r="13" fill="#e6b95b" stroke="#7b6540" stroke-width="3"/><circle cx="' + handX + '" cy="' + handY + '" r="10" fill="#f0c2ac" stroke="#ae7370" stroke-width="3"/>' +
-          '<text x="113" y="337" class="scene-caption">曲げる筋肉（上側） ' + Math.round(upper * 100) + '%</text><text x="402" y="337" class="scene-caption">伸ばす筋肉（下側） ' + Math.round(lower * 100) + '%</text>' +
+          '<text x="113" y="337" class="scene-caption">曲げる筋肉（上側）</text><text x="402" y="337" class="scene-caption">伸ばす筋肉（下側）</text>' +
           '<path d="M360 185 A27 27 0 0 1 ' + (360 + Math.cos(rad) * 30) + ' ' + (210 + Math.sin(rad) * 30) + '" fill="none" stroke="#7d7270" stroke-width="2"/>' +
         '</svg>';
       const upperText = upper > lower ? "縮んでかたくなりやすい" : "ゆるみやすい";
       const lowerText = lower > upper ? "縮んでかたくなりやすい" : "ゆるみやすい";
       core.renderReadout(view.readout, {
         metrics: [
-          { label: "曲げる筋肉（上側）", value: upperText, detail: Math.round(upper * 100) + " / 100" },
-          { label: "伸ばす筋肉（下側）", value: lowerText, detail: Math.round(lower * 100) + " / 100" }
+          { label: "曲げる筋肉（上側）", value: upperText, detail: "模型上の表示" },
+          { label: "伸ばす筋肉（下側）", value: lowerText, detail: "模型上の表示" }
         ],
         message: "一方の筋肉が縮むと、反対側はゆるみ、骨を引いて腕を動かします。"
       });
