@@ -2,14 +2,14 @@
   "use strict";
 
   const MANIFESTS = {
-    seasons: { id:"seasons", title:"季節と生き物LAB", unit:"季節と生き物", icon:"🌸", summary:"気温を変えて、生き物の成長や活動の変化を見ます。", accent:"#4b8f57", modelNote:"気温と生き物の変化の関係が見えやすいように、季節の変化を単純なモデルで表しています。" },
+    seasons: { id:"seasons", title:"季節と生き物LAB", unit:"季節と生き物", icon:"🌸", summary:"気温を変えて、生き物の成長や活動の変化を見ます。", accent:"#4b8f57", modelNote:"季節の変化を見つけやすくした模型です。葉や活動の数は実際の数を予測せず、実際の変化には複数の条件が関係します。"  },
     body: { id:"body", title:"人の体LAB", unit:"ヒトの体と運動", icon:"💪", summary:"腕の角度を変えて、筋肉と関節の動きを比べます。", accent:"#b45f62", modelNote:"筋肉が縮んだりゆるんだりして骨を引く関係を、腕の模型として表しています。" },
     weather: { id:"weather", title:"天気と気温LAB", unit:"天気と気温", icon:"🌤️", summary:"天気と時刻を変えて、1日の気温の変化を見ます。", accent:"#d28a25", modelNote:"実際の天気は場所や季節でも変わります。ここでは天気と時刻の関係に注目します。" },
-    rainwater: { id:"rainwater", title:"雨水LAB", unit:"雨水のゆくえ", icon:"🌧️", summary:"地面の傾きと種類を変えて、水の流れ方を比べます。", accent:"#367ba1", modelNote:"地面の傾き、水の通りやすさ、低い場所への集まり方を単純化しています。" },
+    rainwater: { id:"rainwater", title:"雨水LAB", unit:"雨水のゆくえ", icon:"🌧️", summary:"地面の傾きと種類を変えて、水の流れ方を比べます。", accent:"#367ba1", modelNote:"傾きやしみこみやすさの数値は、違いを比べるための模型上の設定です。実際の地面では土の粒や固まり方、水の量などでも変わります。"  },
     moonstars: { id:"moonstars", title:"月と星LAB", unit:"月と星", icon:"🌙", summary:"時刻や日にちを変えて、月と星の見え方を比べます。", accent:"#665ba7", modelNote:"空の見え方を学ぶため、月や星の位置・形を観察しやすく表しています。" },
     electricity: { id:"electricity", title:"電気LAB", unit:"電気のはたらき", icon:"⚡", summary:"乾電池の数と向きを変えて、モーターの変化を見ます。", accent:"#bd8a12", modelNote:"乾電池の数や向きと、電流・モーターの回り方の関係を単純化しています。" },
     airwater: { id:"airwater", title:"空気と水LAB", unit:"とじこめた空気と水", icon:"💨", summary:"中身と押す強さを変えて、縮み方と手ごたえを比べます。", accent:"#4a91a0", modelNote:"注射器の中身を空気と水に分け、押したときの体積変化を見やすく表しています。" },
-    volume: { id:"volume", title:"体積LAB", unit:"ものの温度と体積", icon:"🌡️", summary:"物の種類と温度を変えて、体積の変化を比べます。", accent:"#cf6445", modelNote:"空気・水・金属の温度による体積変化の大きさを、比べやすくしたモデルです。" },
+    volume: { id:"volume", title:"体積LAB", unit:"ものの温度と体積", icon:"🌡️", summary:"物の種類と温度を変えて、体積の変化を比べます。", accent:"#cf6445", modelNote:"10〜80℃の範囲で空気・水・金属を比べる模型です。図と数値は変化の違いを見つけやすくしたもので、実際の体積を正確に計算するものではありません。"  },
     heating: { id:"heating", title:"あたたまりLAB", unit:"もののあたたまり方", icon:"🔥", summary:"物の種類と熱してからの時間を変えて、熱の伝わり方を見ます。", accent:"#c94e3c", modelNote:"金属は熱が伝わり、水や空気は動きながら温まる特徴を単純化しています。" },
     waterstate: { id:"waterstate", title:"水のすがたLAB", unit:"水のすがたと温度", icon:"🧊", summary:"温度を変えて、氷・水・水蒸気の変化を見ます。", accent:"#2f78ae", modelNote:"気圧などの条件をそろえたときの、水の状態変化を観察するモデルです。" }
   };
