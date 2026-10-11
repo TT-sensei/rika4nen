@@ -38,13 +38,53 @@
       mission.className = "discovery-mission";
       mission.innerHTML = '<div class="mission-heading"><span aria-hidden="true">🔎</span><div><small>はっけんミッション</small><b data-mission-text>' + esc(challenges[0]) + '</b></div></div><div class="mission-dots" role="group" aria-label="ミッションを選ぶ">' +
         challenges.map((item, index) => '<button type="button" aria-pressed="' + (index === 0) + '" data-mission-index="' + index + '">' + (index + 1) + '</button>').join("") + '</div>';
-      const controlArea = view.querySelector("[data-control-panel]");
       controlArea.insertAdjacentElement("afterend", mission);
       mission.querySelectorAll("[data-mission-index]").forEach(button => on(button, "click", () => {
         mission.querySelectorAll("[data-mission-index]").forEach(item => item.setAttribute("aria-pressed", String(item === button)));
         mission.querySelector("[data-mission-text]").textContent = challenges[Number(button.dataset.missionIndex)];
       }));
     }
+    const controlArea = view.querySelector("[data-control-panel]");
+    const randomizeRow = row => {
+      const range = row.querySelector('input[type="range"]');
+      if (range) {
+        const min = Number(range.min), max = Number(range.max), step = Number(range.step) || 1;
+        const count = Math.floor((max - min) / step) + 1;
+        const current = Number(range.value);
+        let next = current;
+        if (count > 1) {
+          for (let attempt = 0; attempt < 5 && next === current; attempt++) {
+            next = min + Math.floor(Math.random() * count) * step;
+          }
+        }
+        range.value = String(next);
+        range.dispatchEvent(new Event("input", { bubbles: true }));
+        return true;
+      }
+      const buttons = Array.from(row.querySelectorAll(".instant-options button"));
+      if (buttons.length > 1) {
+        const current = buttons.find(button => button.getAttribute("aria-pressed") === "true");
+        const choices = buttons.filter(button => button !== current);
+        choices[Math.floor(Math.random() * choices.length)].click();
+        return true;
+      }
+      return false;
+    };
+    const randomizeOne = () => {
+      const rows = Array.from(controlArea.querySelectorAll(".instant-range, .instant-control"))
+        .filter(row => row.querySelector('input[type="range"]') || row.querySelector(".instant-options button"));
+      if (rows.length) randomizeRow(rows[Math.floor(Math.random() * rows.length)]);
+    };
+    const randomizeAll = () => {
+      controlArea.querySelectorAll(".instant-range, .instant-control").forEach(randomizeRow);
+    };
+    const randomButton = document.createElement("button");
+    randomButton.type = "button";
+    randomButton.className = "random-experiment-button";
+    randomButton.textContent = "🎲 条件をシャッフル";
+    randomButton.setAttribute("aria-label", "実験の条件をランダムに変える");
+    on(randomButton, "click", randomizeAll);
+    controlArea.insertAdjacentElement("afterend", randomButton);
     on(stage, "pointerdown", event => {
       const rect = stage.getBoundingClientRect();
       const spark = document.createElement("span");
@@ -53,6 +93,7 @@
       spark.style.top = (event.clientY - rect.top) + "px";
       stage.append(spark);
       window.setTimeout(() => spark.remove(), 520);
+      randomizeOne();
     });
     const trialList = view.querySelector("[data-trial-list]");
     let trialDraft = null;

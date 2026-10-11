@@ -109,7 +109,7 @@
       return null;
     }
     root.innerHTML = '<section class="lab-loading"><span class="lab-loading-mark" aria-hidden="true">' + manifest.icon + '</span><h1>' + manifest.title + 'を準備しています</h1><p>このLABに必要な実験道具だけを読み込んでいます。</p></section>';
-    if (!window.RikaFourLabCore) await loadScript("labs/lab-core.js");
+    if (!window.RikaFourLabCore) await loadScript("labs/lab-core.js?v=touch-random-20261011");
     if (!window.RikaFourSimulations) await loadScript("labs/fourth-labs.js?v=sim-review-20261011");
     const factory = window.RikaFourSimulations && window.RikaFourSimulations[manifest.id];
     if (!factory) throw new Error("Simulation factory missing");
