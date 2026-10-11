@@ -335,7 +335,7 @@
     const pressure = core.range(section, { label: "押す強さ", min: 0, max: 100, value: state.pressure, format: value => value + "%", onInput: value => { state.pressure = value; draw(); } });
     function draw() {
       const volume = state.material === "air" ? 100 - state.pressure * .62 : 100 - state.pressure * .03;
-      const resistance = Math.round(state.material === "air" ? state.pressure * (.35 + state.pressure * .0065) : state.pressure);
+      const resistance = Math.round(state.material === "air" ? state.pressure * (.35 + state.pressure * .003) : state.pressure);
       const innerWidth = volume * 2.7;
       const pistonX = 160 + innerWidth;
       const particleWidth = Math.max(18, innerWidth - 34);
@@ -348,9 +348,9 @@
       core.renderReadout(view.readout, {
         metrics: [
           { label: "体積", value: Math.round(volume) + " / 100", detail: state.material === "air" ? "押すと小さくなる" : "ほぼ変わらない" },
-          { label: "手ごたえ", value: resistance + " / 100", detail: state.material === "water" ? "水は強く押し返す" : "押すほど強くなる" }
+          { label: "手ごたえの目安", value: resistance + " / 100", detail: state.material === "water" ? "水は縮みにくく強く押し返す" : "空気は縮むが、押すほど押し返す" }
         ],
-        message: state.material === "air" ? "空気は押し縮められ、押すほど元にもどろうとする力が強くなります。" : "水はほとんど縮まないため、強く押し返します。"
+        message: state.material === "air" ? "空気は押し縮められ、押すほど元にもどろうとする力が強くなります。手ごたえの数値は、空気と水の違いを比べるための模型上の目安です。" : "水はほとんど縮まないため、強く押し返します。手ごたえの数値は、実際の力を測った値ではありません。"
       });
     }
     return {
