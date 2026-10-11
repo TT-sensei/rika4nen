@@ -68,7 +68,8 @@
           { label: "気温・昼", value: state.temp + "℃・" + state.daylight + "時間", detail: "季節の条件" },
           { label: state.target === "plant" ? "葉・花" : "活動", value: state.target === "plant" ? leaves + "枚ほど" : activity + " / 10", detail: "モデルの目安" }
         ],
-        message: state.target === "plant" ? "植物の変化には、気温と昼の長さの両方が関係するモデルです。" : "このモデルでは気温と昼の長さで活動の目安が変わります。実際には食べ物やすみかにも関係します。"
+        message: state.target === "plant" ? "葉や花の数は、この模型で変化を見やすくした目安です。実際の植物の成長は、気温・日光・水・植物の種類など、いくつもの条件に関係します。" : "活動の数は、この模型で変化を見やすくした目安です。実際の動物の活動は、食べ物・すみか・種類などにも関係します。",
+        note: "この模型は実際の葉の数や動物の数を予測するものではありません。同じ場所で観察した記録と比べて考えよう。"
       });
     }
     return {
@@ -175,20 +176,20 @@
     const slope = core.range(section, { label: "地面の傾き", min: 0, max: 100, value: state.slope, format: value => value + "%", onInput: value => { state.slope = value; draw(); } });
     const ground = core.options(section, { label: "地面", values: [option("sand", "砂"), option("soil", "細かい土"), option("concrete", "コンクリート")], value: state.ground, format: item => item.label, onChange: value => { state.ground = value; draw(); } });
     function draw() {
-      const infiltration = { sand: 88, soil: 54, concrete: 6 }[state.ground];
+      const infiltration = { sand: 3, soil: 2, concrete: 0 }[state.ground];
       const speed = Math.round(state.slope * .75);
-      const runoff = Math.round((100 - infiltration) * (.25 + state.slope * .0075));
+      const runoff = Math.round((3 - infiltration) * (.25 + state.slope * .0075) * 10);
       const groundName = {sand:"砂",soil:"細かい土",concrete:"コンクリート"}[state.ground];
       const groundColor = {sand:"#d7c08c",soil:"#a98d72",concrete:"#aeb9bc"}[state.ground];
       const leftY = Math.round(270 - state.slope * .72), rightY = 270;
       const surface = 'M85 ' + leftY + ' Q320 ' + ((leftY + rightY) / 2 + 5) + ' 555 ' + rightY;
       const drops = [155,220,285,350].map((x,i) => '<path d="M' + x + ' 105 v42" stroke="#4b94ae" stroke-width="4" marker-end="url(#waterArrow)" opacity="' + (.65 + i*.08) + '"/>').join("");
-      const soakCount = Math.max(1, Math.round(infiltration / 18));
+      const soakCount = Math.max(0, infiltration);
       const soak = Array.from({ length: soakCount }, (_, i) => {
         const x = 175 + i * 48;
         const t = (x - 85) / 470;
         const y = leftY + (rightY - leftY) * t + 4;
-        return '<path class="soak-arrow" d="M' + x + ' ' + y + ' v' + (22 + infiltration * .28) + '" stroke="#3d8fa9" stroke-width="4" marker-end="url(#waterArrow)" opacity="' + (.35 + infiltration/180) + '"/>';
+        return '<path class="soak-arrow" d="M' + x + ' ' + y + ' v' + (22 + infiltration * 10) + '" stroke="#3d8fa9" stroke-width="4" marker-end="url(#waterArrow)" opacity="' + (.35 + infiltration*.18) + '"/>';
       }).join("");
       const flow = state.slope > 0 ? '<path class="runoff-arrow" d="' + surface + '" fill="none" stroke="#398da9" stroke-width="' + (5 + runoff*.05) + '" stroke-linecap="round" marker-end="url(#waterArrow)"/>' : '<ellipse cx="350" cy="260" rx="68" ry="12" fill="#74b9cc"/>';
       view.stage.innerHTML =
@@ -196,15 +197,16 @@
           '<defs><marker id="waterArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#398da9"/></marker></defs><rect width="640" height="360" fill="#edf6fa"/>' +
           '<text x="28" y="38" class="scene-title">雨水の2つの行き先</text><text x="30" y="74" class="scene-caption">①低い方へ流れる　②地面の中へしみこむ</text>' + drops +
           '<path d="' + surface + ' L640 360 H0Z" fill="' + groundColor + '"/><path d="' + surface + '" fill="none" stroke="#75624e" stroke-width="4"/>' + flow + soak +
-          '<text x="70" y="' + Math.max(105,leftY-16) + '" class="component-label">高い</text><text x="528" y="252" class="component-label">低い</text><path d="M555 282 Q592 270 622 286 Q596 331 548 316Z" fill="#6db4ca" opacity="' + clamp(runoff / 65, .18, .95) + '"/>' +
+          '<text x="70" y="' + Math.max(105,leftY-16) + '" class="component-label">高い</text><text x="528" y="252" class="component-label">低い</text><path d="M555 282 Q592 270 622 286 Q596 331 548 316Z" fill="#6db4ca" opacity="' + clamp(runoff / 20, .18, .95) + '"/>' +
           '<g transform="translate(35 300)"><rect width="465" height="38" rx="11" fill="#fff" opacity=".92"/><text x="16" y="25" class="component-label">青い横矢印＝流れる　　青い下矢印＝しみこむ　　地面：' + groundName + '</text></g>' +
         '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
-          { label: "流れやすさ", value: speed + " / 75", detail: state.slope === 0 ? "傾きなし" : "傾きが大きいほど流れやすい" },
-          { label: "地面へのしみこみ", value: infiltration + "%", detail: state.ground === "sand" ? "すき間が大きい" : state.ground === "concrete" ? "ほとんど通さない" : "土のすき間" }
+          { label: "地面の傾き", value: state.slope + " / 100", detail: "模型上の設定値（実測値ではありません）" },
+          { label: "しみこみやすさ", value: state.ground === "sand" ? "しみこみやすい" : state.ground === "soil" ? "中くらい" : "しみこみにくい", detail: "地面の種類による違いを模式化" }
         ],
-        message: "雨水は高い所から低い所へ流れます。地面の種類によって、下へしみこむ量が変わります。"
+        message: "雨水は高い所から低い所へ流れます。地面の種類によって、しみこみ方も変わります。",
+        note: "傾きの数値やしみこみやすさは、違いを比べるための模型です。実際の地面の水の通り方は、土の粒・固まり方・水の量などでも変わります。"
       });
     }
     return {
@@ -356,7 +358,7 @@
     const state = { material: "air", temperature: 20 };
     const section = core.section(view.panel, "物の種類と温度を変える", "温めたときと冷やしたときの体積を比べよう。");
     const material = core.options(section, { label: "物", values: [option("air", "空気"), option("water", "水"), option("metal", "金属")], value: state.material, format: item => item.label, onChange: value => { state.material = value; draw(); } });
-    const temperature = core.range(section, { label: "温度", min: -20, max: 80, value: state.temperature, format: value => value + "℃", onInput: value => { state.temperature = value; draw(); } });
+    const temperature = core.range(section, { label: "温度", min: 10, max: 80, value: state.temperature, format: value => value + "℃", onInput: value => { state.temperature = value; draw(); } });
     function draw() {
       const delta = state.temperature - 20;
       const coefficient = { air: .0034, water: .00021, metal: .00005 }[state.material];
@@ -373,8 +375,8 @@
           { label: "温度", value: state.temperature + "℃", detail: delta > 0 ? "温めた" : delta < 0 ? "冷やした" : "基準" },
           { label: "体積", value: (percent >= 0 ? "+" : "") + one(percent, 2) + "%", detail: labels[state.material] }
         ],
-        message: delta === 0 ? "20℃を基準に、温めたり冷やしたりして比べよう。" : delta > 0 ? "温めると体積は大きくなります。空気・水・金属で変化の大きさが違います。" : "冷やすと体積は小さくなります。空気の変化が最も大きいモデルです。",
-        note: "円の大きさは、小さな違いを見つけやすいように拡大して表示しています。"
+        message: delta === 0 ? "20℃を基準に、温めたり冷やしたりして比べよう。" : delta > 0 ? "この模型では、温めると体積が大きくなります。空気・水・金属で変化の大きさを比べよう。" : "この模型の温度範囲では、冷やすと体積が小さくなるものとして表しています。空気の変化が最も大きい模型です。",
+        note: "温度は10〜80℃の範囲で比べます。円の大きさと数値は違いを見つけやすくした模型上の表現で、実際の体積変化を正確に計算したものではありません。"
       });
     }
     return {
@@ -382,8 +384,8 @@
       stageHint: "タッチして温度を変えよう",
       stepLabel: "🌡️ 温度を変える",
       reset: () => { state.material = "air"; state.temperature = 20; material.set(state.material); temperature.set(state.temperature); draw(); },
-      step: () => { state.temperature = state.temperature >= 80 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); },
-      stageTouch: () => { state.temperature = state.temperature >= 80 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); }
+      step: () => { state.temperature = state.temperature >= 80 ? 10 : Math.min(80, state.temperature + 20); temperature.set(state.temperature); draw(); },
+      stageTouch: () => { state.temperature = state.temperature >= 80 ? 10 : Math.min(80, state.temperature + 20); temperature.set(state.temperature); draw(); }
     };
   }
 
