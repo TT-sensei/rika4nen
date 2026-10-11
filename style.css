@@ -588,3 +588,16 @@ button:focus-visible,input:focus-visible{outline-color:rgba(185,88,122,.38)}
 .random-experiment-button:hover{filter:brightness(1.06)}.random-experiment-button:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--lab-accent) 72%,#172e35)}
 @media(max-width:760px){.instant-lab .sim-stage::after{right:6px;bottom:6px;padding:5px 8px;font-size:.64rem}.random-experiment-button{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.random-experiment-button{transition:none}}
+
+
+/* Gentle, meaning-linked motion for the fourth-grade simulator diagrams. */
+.instant-lab .season-leaf{transform-box:fill-box;transform-origin:center;animation:seasonLeafSway 2.8s ease-in-out infinite alternate}
+.instant-lab .season-leaf:nth-of-type(3n){animation-delay:-1.1s}
+.instant-lab .temperature-point{transform-box:fill-box;transform-origin:center;animation:temperaturePointPulse 1.4s ease-in-out infinite}
+.instant-lab .flexing-muscle,.instant-lab .relaxing-muscle{animation:muscleEmphasis 1.8s ease-in-out infinite}
+.instant-lab .moving-moon{animation:moonGlowPulse 2.8s ease-in-out infinite}
+@keyframes seasonLeafSway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+@keyframes temperaturePointPulse{0%,100%{opacity:.8;stroke:#fff;stroke-width:1}50%{opacity:1;stroke:#fff;stroke-width:4}}
+@keyframes muscleEmphasis{0%,100%{opacity:.72}50%{opacity:1}}
+@keyframes moonGlowPulse{0%,100%{filter:drop-shadow(0 0 2px rgba(255,245,190,.25))}50%{filter:drop-shadow(0 0 9px rgba(255,245,190,.8))}}
+@media(prefers-reduced-motion:reduce){.instant-lab .season-leaf,.instant-lab .temperature-point,.instant-lab .flexing-muscle,.instant-lab .relaxing-muscle,.instant-lab .moving-moon{animation:none!important}}

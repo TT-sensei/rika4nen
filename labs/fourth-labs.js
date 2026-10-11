@@ -49,7 +49,7 @@
       const leafMarks = Array.from({ length: leaves }, (_, i) => {
         const x = 306 + (i % 2) * 52 + Math.floor(i / 2) * 3;
         const y = 265 - Math.floor(i / 2) * 23 - (i % 2) * 5;
-        return '<ellipse cx="' + x + '" cy="' + y + '" rx="28" ry="14" transform="rotate(' + (i % 2 ? 25 : -25) + ' ' + x + ' ' + y + ')" fill="' + (state.temp > 10 ? "#65a865" : "#9baf70") + '"/>';
+        return '<ellipse class="season-leaf" cx="' + x + '" cy="' + y + '" rx="28" ry="14" transform="rotate(' + (i % 2 ? 25 : -25) + ' ' + x + ' ' + y + ')" fill="' + (state.temp > 10 ? "#65a865" : "#9baf70") + '"/>';
       }).join("");
       const bugs = state.target === "animal" ? Array.from({ length: Math.max(1, Math.round(activity / 2)) }, (_, i) =>
         '<circle cx="' + (170 + i * 54) + '" cy="' + (280 - (i % 2) * 30) + '" r="8" fill="#df8c3e"/><circle cx="' + (164 + i * 54) + '" cy="' + (275 - (i % 2) * 30) + '" r="5" fill="#855b51"/><circle cx="' + (176 + i * 54) + '" cy="' + (275 - (i % 2) * 30) + '" r="5" fill="#855b51"/>'
@@ -100,7 +100,7 @@
           '<rect width="640" height="360" fill="#fbf0f1"/><text x="28" y="42" class="scene-title">曲げると、筋肉はどうなる？</text>' +
           '<circle cx="245" cy="100" r="38" fill="#f0c2ac" stroke="#ae7370" stroke-width="4"/><path d="M245 140 L245 240 M245 165 L185 220 M245 165 L300 220 M245 240 L205 315 M245 240 L290 315" fill="none" stroke="#ad6b72" stroke-width="17" stroke-linecap="round"/>' +
           '<path d="M245 160 L360 210" fill="none" stroke="#f0c2ac" stroke-width="' + (28 + upperWidth) + '" stroke-linecap="round"/><path d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#f0c2ac" stroke-width="' + (24 + lowerWidth) + '" stroke-linecap="round"/>' +
-          '<path d="M250 160 L360 210" fill="none" stroke="#bd5e6b" stroke-width="' + upperWidth + '" stroke-linecap="round"/><path d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#6e94af" stroke-width="' + lowerWidth + '" stroke-linecap="round"/>' +
+          '<path class="flexing-muscle" d="M250 160 L360 210" fill="none" stroke="#bd5e6b" stroke-width="' + upperWidth + '" stroke-linecap="round"/><path class="relaxing-muscle" d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#6e94af" stroke-width="' + lowerWidth + '" stroke-linecap="round"/>' +
           '<circle cx="360" cy="210" r="13" fill="#e6b95b" stroke="#7b6540" stroke-width="3"/><circle cx="' + handX + '" cy="' + handY + '" r="10" fill="#f0c2ac" stroke="#ae7370" stroke-width="3"/>' +
           '<text x="113" y="337" class="scene-caption">曲げる筋肉（上側）</text><text x="402" y="337" class="scene-caption">伸ばす筋肉（下側）</text>' +
           '<path d="M360 185 A27 27 0 0 1 ' + (360 + Math.cos(rad) * 30) + ' ' + (210 + Math.sin(rad) * 30) + '" fill="none" stroke="#7d7270" stroke-width="2"/>' +
@@ -150,7 +150,7 @@
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="天気と1日の気温変化">' +
           '<defs><linearGradient id="weatherSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8edf8"/><stop offset="1" stop-color="#f8fbf6"/></linearGradient><radialGradient id="weatherSun"><stop offset="0" stop-color="#fff7c7"/><stop offset="1" stop-color="#f0b83e"/></radialGradient><linearGradient id="weatherCloud" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8fcff"/><stop offset="1" stop-color="#a8bdca"/></linearGradient></defs><rect width="640" height="360" fill="url(#weatherSky)"/><rect y="300" width="640" height="60" fill="#c5dfb0"/><text x="28" y="42" class="scene-title">天気と気温の変化</text>' + sky.replace(/#f4c94d/g, "url(#weatherSun)").replace(/#b5c7ce/g, "url(#weatherCloud)").replace(/#8ba9bd/g, "#9eb8ca") +
           '<text x="30" y="82" class="scene-caption">' + state.time + '時　' + temperature + '℃</text><line x1="90" y1="290" x2="590" y2="290" stroke="#9ab3b0" stroke-width="2"/>' +
-          '<polyline points="' + points + '" fill="none" stroke="#d28a25" stroke-width="5"/><line x1="' + pointX + '" y1="' + pointY + '" x2="' + pointX + '" y2="290" stroke="#d28a25" stroke-width="2" stroke-dasharray="5 5"/><circle cx="' + pointX + '" cy="' + pointY + '" r="9" fill="#d28a25"/>' +
+          '<polyline points="' + points + '" fill="none" stroke="#d28a25" stroke-width="5"/><line x1="' + pointX + '" y1="' + pointY + '" x2="' + pointX + '" y2="290" stroke="#d28a25" stroke-width="2" stroke-dasharray="5 5"/><circle class="temperature-point" cx="' + pointX + '" cy="' + pointY + '" r="9" fill="#d28a25"/>' +
           '<text x="82" y="320" class="component-label">6時</text><text x="350" y="320" class="component-label">14時ごろ</text><text x="555" y="320" class="component-label">20時</text></svg>';
       core.renderReadout(view.readout, {
         metrics: [
