@@ -288,19 +288,22 @@
       const speedLevel = effective === 0 ? 0 : Math.abs(effective) === 2 ? 2 : 1;
       const speedText = speedLevel === 0 ? "停止" : speedLevel === 2 ? "速い（模型上の目安）" : "回転する（模型上の目安）";
       const rotation = effective > 0 ? "右回り" : effective < 0 ? "左回り" : "停止";
-      const cellX = state.batteries === 1 ? [175] : [135,245];
+      // Cells are drawn directly into the bottom wire so the closed series circuit is visible.
+      const cellX = state.batteries === 1 ? [205] : [165, 275];
       const cells = cellX.map((x, i) => {
         const reversed = state.direction === "reverse" && (state.batteries === 1 || i === state.batteries - 1);
-        return '<g transform="translate(' + x + ' 246)"><rect width="74" height="46" rx="8" fill="#f5d979" stroke="#9a7726" stroke-width="3"/><line x1="' + (reversed ? 55 : 14) + '" y1="8" x2="' + (reversed ? 55 : 14) + '" y2="38" stroke="#725715" stroke-width="6"/><line x1="' + (reversed ? 17 : 54) + '" y1="14" x2="' + (reversed ? 17 : 54) + '" y2="32" stroke="#725715" stroke-width="3"/><text x="' + (reversed ? 48 : 5) + '" y="4" class="tiny-label">＋</text><text x="' + (reversed ? 8 : 48) + '" y="4" class="tiny-label">−</text></g>';
+        const longX = x + (reversed ? 22 : 38);
+        const shortX = x + (reversed ? 38 : 22);
+        return '<g><line x1="' + (x - 25) + '" y1="260" x2="' + (x + 12) + '" y2="260" stroke="' + circuitColor + '" stroke-width="6"/><line x1="' + (x + 48) + '" y1="260" x2="' + (x + 78) + '" y2="260" stroke="' + circuitColor + '" stroke-width="6"/><line x1="' + longX + '" y1="238" x2="' + longX + '" y2="282" stroke="#a27c22" stroke-width="7" stroke-linecap="round"/><line x1="' + shortX + '" y1="246" x2="' + shortX + '" y2="274" stroke="#a27c22" stroke-width="4" stroke-linecap="round"/><text x="' + (longX - 5) + '" y="230" class="tiny-label">' + (reversed ? "−" : "＋") + '</text><text x="' + (shortX - 5) + '" y="296" class="tiny-label">' + (reversed ? "＋" : "−") + '</text><text x="' + (x + 15) + '" y="318" class="tiny-label">乾電池</text></g>';
       }).join("");
       const arrow = effective === 0 ? '<line x1="488" y1="165" x2="548" y2="165" stroke="#8b9694" stroke-width="8"/><text x="488" y="114" class="component-label">打ち消し合って停止</text>' : '<path d="' + (effective > 0 ? "M480 157 A38 38 0 1 1 540 132" : "M548 157 A38 38 0 1 0 488 132") + '" fill="none" stroke="#bd8a12" stroke-width="7" marker-end="url(#motorArrow)"/>';
       const circuitColor = effective === 0 ? "#7e918d" : "#bd8a12";
       view.stage.innerHTML =
         '<svg class="extra-svg motor-circuit-diagram" viewBox="0 0 640 360" role="img" aria-label="乾電池の数と向きによってモーターの速さや回る向きが変わる回路">' +
-          '<defs><marker id="motorArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#bd8a12"/></marker></defs><rect width="640" height="360" fill="#f7f5e9"/><text x="28" y="38" class="scene-title">乾電池の向き → モーターの回り方</text><text x="30" y="74" class="scene-caption">回路を一周たどり、＋と−の向きを見よう</text>' +
-          '<path d="M90 220 V115 H470 M550 205 V315 H90 V220" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M470 115 V125 M550 205 V205" stroke="' + circuitColor + '" stroke-width="7"/>' +
-          cells + '<g><circle cx="510" cy="165" r="48" fill="#e7ece6" stroke="#6c837d" stroke-width="5"/><circle cx="510" cy="165" r="11" fill="#6c837d"/><path d="M510 154 l-17 -25 M510 154 l17 -25 M510 176 l-17 25 M510 176 l17 25" stroke="#8ca09b" stroke-width="8" stroke-linecap="round"/>' + arrow + '<text x="474" y="236" class="component-label">モーター</text></g>' +
-          '<rect x="465" y="260" width="100" height="12" rx="6" fill="#e0e7e3"/><rect x="465" y="260" width="' + (speedLevel * 45) + '" height="12" rx="6" fill="#bd8a12"/><text x="465" y="291" class="component-label">回転の目安</text><g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '</text></g>' +
+          '<defs><marker id="motorArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#bd8a12"/></marker><linearGradient id="circuitBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbfaf2"/><stop offset="1" stop-color="#e8f0e9"/></linearGradient></defs><rect width="640" height="360" fill="url(#circuitBg)"/><path d="M0 90 H640 M0 180 H640 M0 270 H640" stroke="#d7e2d9" stroke-width="1" opacity=".55"/><text x="28" y="38" class="scene-title">乾電池の向き → モーターの回り方</text><text x="30" y="74" class="scene-caption">導線をたどって、電気の通り道を確かめよう</text>' +
+          '<path d="M90 260 V165 H510 V117 M510 213 V260 H' + (state.batteries === 1 ? 183 : 143) + '" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M' + (state.batteries === 1 ? 283 : 353) + ' 260 H510" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round"/><path d="M510 117 V123 M510 207 V213" stroke="' + circuitColor + '" stroke-width="7"/>' +
+          cells + '<g><circle cx="510" cy="165" r="48" fill="#f8fbf7" stroke="#6c837d" stroke-width="5"/><circle cx="510" cy="165" r="11" fill="#6c837d"/><path d="M510 154 l-17 -25 M510 154 l17 -25 M510 176 l-17 25 M510 176 l17 25" stroke="#8ca09b" stroke-width="8" stroke-linecap="round"/>' + arrow + '<text x="474" y="236" class="component-label">モーター</text></g>' +
+          '<rect x="445" y="286" width="140" height="12" rx="6" fill="#d6e1dc"/><rect x="445" y="286" width="' + (speedLevel * 65) + '" height="12" rx="6" fill="#bd8a12"/><text x="445" y="318" class="component-label">回転の目安</text><g transform="translate(55 342)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + ' → ' + rotation + '</text></g>' +
         '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
@@ -434,7 +437,7 @@
       const isIce = t < 0, freezing = t === 0, boiling = t === 100, isSteam = t > 100;
       const stateName = isIce ? "氷（固体）" : freezing ? "氷と水" : boiling ? "水と水蒸気" : isSteam ? "水蒸気（気体）" : "水（液体）";
       const showIce = isIce || freezing, showWater = (!isIce && !isSteam), showSteam = boiling || isSteam;
-      const particles = showSteam ? Array.from({ length: 12 }, (_, i) => '<circle cx="' + (160 + (i * 47) % 330) + '" cy="' + (125 + (i * 31) % 105) + '" r="6" fill="#a1c2cb" opacity=".55"/>').join("") : "";
+      const particles = showSteam ? Array.from({ length: 12 }, (_, i) => '<circle cx="' + (195 + (i * 47) % 255) + '" cy="' + (132 + (i * 19) % 62) + '" r="5" fill="#7baebc" stroke="#eefaff" stroke-width="1.5" opacity=".72"/>').join("") : "";
       const boilingBubbles = boiling ? Array.from({ length: 6 }, (_, i) => '<circle cx="' + (215 + i * 38) + '" cy="' + (252 - (i % 3) * 17) + '" r="5" fill="#e8fbff" stroke="#4b9db1" stroke-width="2"/>').join("") : "";
       const ice = showIce ? '<g fill="#b8e2ee" stroke="#5798aa" stroke-width="3"><path d="M235 215 l35 -35 55 12 19 53 -37 39 -57 -12z"/><path d="M270 180 l15 50 59 15"/></g>' : "";
       const water = showWater ? '<path d="M180 ' + (freezing ? 235 : 220) + ' Q320 ' + (freezing ? 220 : 190) + ' 460 ' + (freezing ? 235 : 220) + ' V285 H180Z" fill="#62b4c4" opacity=".78"/>' : "";
