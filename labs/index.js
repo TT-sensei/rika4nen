@@ -7,7 +7,7 @@
     weather: { id:"weather", title:"天気と気温LAB", unit:"天気と気温", icon:"🌤️", summary:"天気と時刻を変えて、1日の気温の変化を見ます。", accent:"#d28a25", modelNote:"実際の天気は場所や季節でも変わります。ここでは天気と時刻の関係に注目します。" },
     rainwater: { id:"rainwater", title:"雨水LAB", unit:"雨水のゆくえ", icon:"🌧️", summary:"地面の傾きと種類を変えて、水の流れ方を比べます。", accent:"#367ba1", modelNote:"傾きやしみこみやすさの数値は、違いを比べるための模型上の設定です。実際の地面では土の粒や固まり方、水の量などでも変わります。"  },
     moonstars: { id:"moonstars", title:"月と星LAB", unit:"月と星", icon:"🌙", summary:"時刻や日にちを変えて、月と星の見え方を比べます。", accent:"#665ba7", modelNote:"空の見え方を学ぶため、月や星の位置・形を観察しやすく表しています。" },
-    electricity: { id:"electricity", title:"電気LAB", unit:"電気のはたらき", icon:"⚡", summary:"乾電池の数と向きを変えて、モーターの変化を見ます。", accent:"#bd8a12", modelNote:"乾電池の数や向きと、電流・モーターの回り方の関係を単純化しています。" },
+    electricity: { id:"electricity", title:"電気LAB", unit:"電気のはたらき", icon:"⚡", summary:"乾電池の数と向きを変えて、モーターの変化を見ます。", accent:"#bd8a12", modelNote:"直列につないだ乾電池の向きと数による違いを模式化しています。回転の速さは実測値ではなく、条件による違いを比べるための目安です。" },
     airwater: { id:"airwater", title:"空気と水LAB", unit:"とじこめた空気と水", icon:"💨", summary:"中身と押す強さを変えて、縮み方と手ごたえを比べます。", accent:"#4a91a0", modelNote:"注射器の中身を空気と水に分け、押したときの体積変化を見やすく表しています。" },
     volume: { id:"volume", title:"体積LAB", unit:"ものの温度と体積", icon:"🌡️", summary:"物の種類と温度を変えて、体積の変化を比べます。", accent:"#cf6445", modelNote:"10〜80℃の範囲で空気・水・金属を比べる模型です。図と数値は変化の違いを見つけやすくしたもので、実際の体積を正確に計算するものではありません。"  },
     heating: { id:"heating", title:"あたたまりLAB", unit:"もののあたたまり方", icon:"🔥", summary:"物の種類と熱してからの時間を変えて、熱の伝わり方を見ます。", accent:"#c94e3c", modelNote:"金属は熱が伝わり、水や空気は動きながら温まる特徴を単純化しています。" },

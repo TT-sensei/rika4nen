@@ -285,7 +285,8 @@
     const direction = core.options(section, { label: "乾電池の向き", values: [option("normal", "同じ向き"), option("reverse", "1個を反対")], value: state.direction, format: item => item.label, onChange: value => { state.direction = value; draw(); } });
     function draw() {
       const effective = state.direction === "reverse" ? (state.batteries === 1 ? -1 : state.batteries - 2) : state.batteries;
-      const speed = Math.abs(effective) * 35;
+      const speedLevel = effective === 0 ? 0 : Math.abs(effective) === 2 ? 2 : 1;
+      const speedText = speedLevel === 0 ? "停止" : speedLevel === 2 ? "速い（模型上の目安）" : "回転する（模型上の目安）";
       const rotation = effective > 0 ? "右回り" : effective < 0 ? "左回り" : "停止";
       const cellX = state.batteries === 1 ? [175] : [135,245];
       const cells = cellX.map((x, i) => {
@@ -299,14 +300,14 @@
           '<defs><marker id="motorArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#bd8a12"/></marker></defs><rect width="640" height="360" fill="#f7f5e9"/><text x="28" y="38" class="scene-title">乾電池の向き → モーターの回り方</text><text x="30" y="74" class="scene-caption">回路を一周たどり、＋と−の向きを見よう</text>' +
           '<path d="M90 220 V115 H470 M550 205 V315 H90 V220" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M470 115 V125 M550 205 V205" stroke="' + circuitColor + '" stroke-width="7"/>' +
           cells + '<g><circle cx="510" cy="165" r="48" fill="#e7ece6" stroke="#6c837d" stroke-width="5"/><circle cx="510" cy="165" r="11" fill="#6c837d"/><path d="M510 154 l-17 -25 M510 154 l17 -25 M510 176 l-17 25 M510 176 l17 25" stroke="#8ca09b" stroke-width="8" stroke-linecap="round"/>' + arrow + '<text x="474" y="236" class="component-label">モーター</text></g>' +
-          '<rect x="465" y="260" width="100" height="12" rx="6" fill="#e0e7e3"/><rect x="465" y="260" width="' + (100 * speed / 70) + '" height="12" rx="6" fill="#bd8a12"/><text x="465" y="291" class="component-label">回転の速さ</text><g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '　速さ ' + speed + ' / 70</text></g>' +
+          '<rect x="465" y="260" width="100" height="12" rx="6" fill="#e0e7e3"/><rect x="465" y="260" width="' + (speedLevel * 45) + '" height="12" rx="6" fill="#bd8a12"/><text x="465" y="291" class="component-label">回転の目安</text><g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '</text></g>' +
         '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
           { label: "乾電池", value: state.batteries + "個", detail: state.direction === "reverse" ? "1個を反対向き" : "＋と−を同じ向きにそろえる" },
-          { label: "モーター", value: rotation, detail: "速さ " + speed + " / 70" }
+          { label: "モーター", value: rotation, detail: speedText }
         ],
-        message: state.batteries === 1 && state.direction === "reverse" ? "乾電池1個の向きを反対にすると、モーターの回る向きも反対になります。" : effective === 0 ? "2個の乾電池を反対向きにつなぐと、はたらきが打ち消し合うモデルです。" : "同じ向きの乾電池を増やすと、モーターは同じ向きに速く回ります。"
+        message: state.batteries === 1 && state.direction === "reverse" ? "乾電池1個の向きを反対にすると、モーターの回る向きも反対になります。" : effective === 0 ? "2個の乾電池を反対向きにつなぐと、はたらきが打ち消し合うモデルです。" : "同じ向きに直列につないだ乾電池を増やすと、モーターは速く回る傾向があります。速さの表示は、実測値ではなく変化を比べるための模型です。"
       });
     }
     return {
