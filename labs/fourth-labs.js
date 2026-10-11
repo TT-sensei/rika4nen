@@ -10,6 +10,9 @@
     const view = core.shell(root, manifest, { onHome: () => host.routeTo("lab") });
     view.note.textContent = manifest.modelNote || "";
     const model = create(view, core);
+    if (typeof model.stageTouch === "function" && view.setStageTouchAction) {
+      view.setStageTouchAction(() => model.stageTouch());
+    }
     core.action(view.actions, "リセット", () => model.reset());
     core.action(view.actions, model.stepLabel || "条件を1つ進める", () => model.step());
     core.action(view.actions, "この結果をくらべる", () => {
@@ -197,7 +200,8 @@
     return {
       render: draw,
       reset: () => { state.slope = 55; state.ground = "sand"; slope.set(state.slope); ground.set(state.ground); draw(); },
-      step: () => { state.slope = state.slope >= 100 ? 0 : Math.min(100, state.slope + 20); slope.set(state.slope); draw(); }
+      step: () => { state.slope = state.slope >= 100 ? 0 : Math.min(100, state.slope + 20); slope.set(state.slope); draw(); },
+      stageTouch: () => { state.slope = state.slope >= 100 ? 0 : Math.min(100, state.slope + 25); slope.set(state.slope); draw(); }
     };
   }
 
@@ -291,7 +295,8 @@
     return {
       render: draw,
       reset: () => { state.batteries = 1; state.direction = "normal"; batteries.set(state.batteries); direction.set(state.direction); draw(); },
-      step: () => { state.batteries = state.batteries >= 2 ? 1 : state.batteries + 1; batteries.set(state.batteries); draw(); }
+      step: () => { state.batteries = state.batteries >= 2 ? 1 : state.batteries + 1; batteries.set(state.batteries); draw(); },
+      stageTouch: () => { state.direction = state.direction === "normal" ? "reverse" : "normal"; direction.set(state.direction); draw(); }
     };
   }
 
@@ -421,7 +426,8 @@
     return {
       render: draw,
       reset: () => { state.temperature = 20; temperature.set(state.temperature); draw(); },
-      step: () => { state.temperature = state.temperature >= 120 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); }
+      step: () => { state.temperature = state.temperature >= 120 ? -20 : state.temperature + 20; temperature.set(state.temperature); draw(); },
+      stageTouch: () => { state.temperature = state.temperature >= 120 ? -20 : Math.min(120, state.temperature + 20); temperature.set(state.temperature); draw(); }
     };
   }
 
