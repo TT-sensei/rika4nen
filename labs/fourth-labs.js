@@ -93,24 +93,26 @@
       const elbowX = 360, elbowY = 210;
       const handX = elbowX + Math.cos(rad) * 112;
       const handY = elbowY + Math.sin(rad) * 112;
-      const upperWidth = 8 + upper * 12;
-      const lowerWidth = 8 + lower * 12;
+      // Both muscles are drawn on opposite sides of the upper arm:
+      // the flexor becomes more prominent as the elbow bends, while the extensor relaxes.
+      const flexorWidth = 8 + upper * 12;
+      const extensorWidth = 8 + lower * 12;
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="腕の角度と筋肉の変化のシミュレーション">' +
           '<rect width="640" height="360" fill="#fbf0f1"/><text x="28" y="42" class="scene-title">曲げると、筋肉はどうなる？</text>' +
           '<circle cx="245" cy="100" r="38" fill="#f0c2ac" stroke="#ae7370" stroke-width="4"/><path d="M245 140 L245 240 M245 165 L185 220 M245 165 L300 220 M245 240 L205 315 M245 240 L290 315" fill="none" stroke="#ad6b72" stroke-width="17" stroke-linecap="round"/>' +
-          '<path d="M245 160 L360 210" fill="none" stroke="#f0c2ac" stroke-width="' + (28 + upperWidth) + '" stroke-linecap="round"/><path d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#f0c2ac" stroke-width="' + (24 + lowerWidth) + '" stroke-linecap="round"/>' +
-          '<path class="flexing-muscle" d="M250 160 L360 210" fill="none" stroke="#bd5e6b" stroke-width="' + upperWidth + '" stroke-linecap="round"/><path class="relaxing-muscle" d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#6e94af" stroke-width="' + lowerWidth + '" stroke-linecap="round"/>' +
+          '<path d="M245 160 L360 210" fill="none" stroke="#f0c2ac" stroke-width="38" stroke-linecap="round"/><path d="M360 210 L' + handX + ' ' + handY + '" fill="none" stroke="#f0c2ac" stroke-width="30" stroke-linecap="round"/>' +
+          '<path class="flexing-muscle" d="M241 169 L356 219" fill="none" stroke="#bd5e6b" stroke-width="' + flexorWidth + '" stroke-linecap="round"/><path class="relaxing-muscle" d="M249 151 L364 201" fill="none" stroke="#6e94af" stroke-width="' + extensorWidth + '" stroke-linecap="round"/>' +
           '<circle cx="360" cy="210" r="13" fill="#e6b95b" stroke="#7b6540" stroke-width="3"/><circle cx="' + handX + '" cy="' + handY + '" r="10" fill="#f0c2ac" stroke="#ae7370" stroke-width="3"/>' +
-          '<text x="113" y="337" class="scene-caption">曲げる筋肉（上側）</text><text x="402" y="337" class="scene-caption">伸ばす筋肉（下側）</text>' +
+          '<path d="M125 312 H154" stroke="#bd5e6b" stroke-width="8" stroke-linecap="round"/><text x="165" y="318" class="scene-caption">曲げる筋肉（力こぶ側）</text><path d="M365 312 H394" stroke="#6e94af" stroke-width="8" stroke-linecap="round"/><text x="405" y="318" class="scene-caption">伸ばす筋肉（反対側）</text>' +
           '<path d="M360 185 A27 27 0 0 1 ' + (360 + Math.cos(rad) * 30) + ' ' + (210 + Math.sin(rad) * 30) + '" fill="none" stroke="#7d7270" stroke-width="2"/>' +
         '</svg>';
-      const upperText = upper > lower ? "縮んでかたくなりやすい" : "ゆるみやすい";
-      const lowerText = lower > upper ? "縮んでかたくなりやすい" : "ゆるみやすい";
+      const flexorText = upper > lower ? "縮んでかたくなりやすい" : "ゆるみやすい";
+      const extensorText = lower > upper ? "縮んでかたくなりやすい" : "ゆるみやすい";
       core.renderReadout(view.readout, {
         metrics: [
-          { label: "曲げる筋肉（上側）", value: upperText, detail: "模型上の表示" },
-          { label: "伸ばす筋肉（下側）", value: lowerText, detail: "模型上の表示" }
+          { label: "曲げる筋肉（力こぶ側）", value: flexorText, detail: "上腕の筋肉・模型上の表示" },
+          { label: "伸ばす筋肉（反対側）", value: extensorText, detail: "上腕の筋肉・模型上の表示" }
         ],
         message: "一方の筋肉が縮むと、反対側はゆるみ、骨を引いて腕を動かします。"
       });
