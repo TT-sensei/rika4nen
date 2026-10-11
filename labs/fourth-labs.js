@@ -41,7 +41,7 @@
       const light = clamp((state.daylight - 8) / 8, 0, 1);
       const growth = clamp(warmth * .65 + light * .35, 0, 1);
       const leaves = Math.round(2 + growth * 10);
-      const activity = Math.round(1 + warmth * 9);
+      const activity = Math.round(1 + warmth * 6 + light * 3);
       const leafMarks = Array.from({ length: leaves }, (_, i) => {
         const x = 306 + (i % 2) * 52 + Math.floor(i / 2) * 3;
         const y = 265 - Math.floor(i / 2) * 23 - (i % 2) * 5;
@@ -64,7 +64,7 @@
           { label: "気温・昼", value: state.temp + "℃・" + state.daylight + "時間", detail: "季節の条件" },
           { label: state.target === "plant" ? "葉・花" : "活動", value: state.target === "plant" ? leaves + "枚ほど" : activity + " / 10", detail: "モデルの目安" }
         ],
-        message: state.target === "plant" ? "植物の変化には、気温と昼の長さの両方が関係するモデルです。" : "動物の活動は気温だけで決まらず、食べ物やすみかにも関係します。"
+        message: state.target === "plant" ? "植物の変化には、気温と昼の長さの両方が関係するモデルです。" : "このモデルでは気温と昼の長さで活動の目安が変わります。実際には食べ物やすみかにも関係します。"
       });
     }
     return {
@@ -77,11 +77,11 @@
   function body(view, core) {
     const state = { angle: 75 };
     const section = core.section(view.panel, "腕の角度を変える", "ゆっくり曲げ伸ばしして、筋肉の変化を見よう。");
-    const angle = core.range(section, { label: "ひじの角度", min: 0, max: 120, value: state.angle, format: value => value + "°", onInput: value => { state.angle = value; draw(); } });
+    const angle = core.range(section, { label: "ひじを曲げる角度", min: 0, max: 120, value: state.angle, format: value => value + "°", onInput: value => { state.angle = value; draw(); } });
     function draw() {
       const upper = clamp((state.angle + 10) / 130, 0, 1);
       const lower = 1 - upper;
-      const rad = (Math.PI / 180) * (180 - state.angle);
+      const rad = (Math.PI / 180) * (23 + state.angle);
       const elbowX = 360, elbowY = 210;
       const handX = elbowX + Math.cos(rad) * 112;
       const handY = elbowY + Math.sin(rad) * 112;
@@ -188,7 +188,7 @@
         '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
-          { label: "表面を流れる速さ", value: speed + " / 75", detail: state.slope === 0 ? "くぼみにたまる" : "高い所から低い所へ" },
+          { label: "流れやすさ", value: speed + " / 75", detail: state.slope === 0 ? "傾きなし" : "傾きが大きいほど流れやすい" },
           { label: "地面へのしみこみ", value: infiltration + "%", detail: state.ground === "sand" ? "すき間が大きい" : state.ground === "concrete" ? "ほとんど通さない" : "土のすき間" }
         ],
         message: "雨水は高い所から低い所へ流れます。地面の種類によって、下へしみこむ量が変わります。"
@@ -197,7 +197,7 @@
     return {
       render: draw,
       reset: () => { state.slope = 55; state.ground = "sand"; slope.set(state.slope); ground.set(state.ground); draw(); },
-      step: () => { state.slope = state.slope >= 100 ? 0 : state.slope + 20; slope.set(state.slope); draw(); }
+      step: () => { state.slope = state.slope >= 100 ? 0 : Math.min(100, state.slope + 20); slope.set(state.slope); draw(); }
     };
   }
 
@@ -253,7 +253,7 @@
     return {
       render: draw,
       reset: () => { state.time = 20; state.day = 15; state.target = "position"; time.set(state.time); day.set(state.day); target.set(state.target); toggleControls(); draw(); },
-      step: () => { if (state.target === "phase") { state.day = state.day >= 30 ? 1 : state.day + 3; day.set(state.day); } else { state.time = state.time >= 24 ? 18 : state.time + 1; time.set(state.time); } draw(); }
+      step: () => { if (state.target === "phase") { state.day = state.day >= 28 ? 1 : state.day + 3; day.set(state.day); } else { state.time = state.time >= 24 ? 18 : state.time + 1; time.set(state.time); } draw(); }
     };
   }
 
@@ -278,7 +278,7 @@
           '<defs><marker id="motorArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#bd8a12"/></marker></defs><rect width="640" height="360" fill="#f7f5e9"/><text x="28" y="38" class="scene-title">乾電池の向き → モーターの回り方</text><text x="30" y="74" class="scene-caption">回路を一周たどり、＋と−の向きを見よう</text>' +
           '<path d="M90 220 V115 H470 M550 205 V315 H90 V220" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M470 115 V125 M550 205 V205" stroke="' + circuitColor + '" stroke-width="7"/>' +
           cells + '<g><circle cx="510" cy="165" r="48" fill="#e7ece6" stroke="#6c837d" stroke-width="5"/><circle cx="510" cy="165" r="11" fill="#6c837d"/><path d="M510 154 l-17 -25 M510 154 l17 -25 M510 176 l-17 25 M510 176 l17 25" stroke="#8ca09b" stroke-width="8" stroke-linecap="round"/>' + arrow + '<text x="474" y="236" class="component-label">モーター</text></g>' +
-          '<g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '　速さ ' + speed + ' / 70</text></g>' +
+          '<rect x="465" y="260" width="100" height="12" rx="6" fill="#e0e7e3"/><rect x="465" y="260" width="' + (100 * speed / 70) + '" height="12" rx="6" fill="#bd8a12"/><text x="465" y="291" class="component-label">回転の速さ</text><g transform="translate(55 326)"><text class="component-label">乾電池 ' + state.batteries + '個・' + (state.direction === "normal" ? "同じ向き" : "1個を反対") + '　→　' + rotation + '　速さ ' + speed + ' / 70</text></g>' +
         '</svg>';
       core.renderReadout(view.readout, {
         metrics: [
@@ -302,7 +302,7 @@
     const pressure = core.range(section, { label: "押す強さ", min: 0, max: 100, value: state.pressure, format: value => value + "%", onInput: value => { state.pressure = value; draw(); } });
     function draw() {
       const volume = state.material === "air" ? 100 - state.pressure * .62 : 100 - state.pressure * .03;
-      const resistance = Math.round(state.material === "air" ? state.pressure * (.35 + state.pressure * .0045) : state.pressure);
+      const resistance = Math.round(state.material === "air" ? state.pressure * (.35 + state.pressure * .0065) : state.pressure);
       const innerWidth = volume * 2.7;
       const pistonX = 160 + innerWidth;
       const particleWidth = Math.max(18, innerWidth - 34);
@@ -310,7 +310,7 @@
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="閉じ込めた空気と水の縮み方">' +
           '<rect width="640" height="360" fill="#eef8fa"/><text x="28" y="42" class="scene-title">押すと、どれくらい縮む？</text><text x="30" y="82" class="scene-caption">' + (state.material === "air" ? "空気" : "水") + '　押す強さ ' + state.pressure + '%</text>' +
-          '<defs><clipPath id="syringeClip"><rect x="160" y="135" width="' + innerWidth + '" height="110"/></clipPath></defs><rect x="150" y="125" width="315" height="130" rx="10" fill="#f8ffff" stroke="#688d99" stroke-width="5"/><rect x="160" y="135" width="' + innerWidth + '" height="110" fill="' + (state.material === "air" ? "#c9edf3" : "#73b9c7") + '" opacity=".55"/><g clip-path="url(#syringeClip)">' + dots + '</g><rect x="' + pistonX + '" y="125" width="13" height="130" fill="#8a6f61"/><path d="M' + pistonX + ' 125 V80" stroke="#8a6f61" stroke-width="10"/>' +
+          '<defs><clipPath id="syringeClip"><rect x="160" y="135" width="' + innerWidth + '" height="110"/></clipPath></defs><rect x="150" y="125" width="315" height="130" rx="10" fill="#f8ffff" stroke="#688d99" stroke-width="5"/><rect x="160" y="135" width="' + innerWidth + '" height="110" fill="' + (state.material === "air" ? "#c9edf3" : "#73b9c7") + '" opacity=".55"/><g clip-path="url(#syringeClip)">' + dots + '</g><rect x="' + pistonX + '" y="125" width="13" height="130" fill="#8a6f61"/><path d="M' + (pistonX + 13) + ' 190 H520" stroke="#8a6f61" stroke-width="10"/><path d="M520 158 V222" stroke="#8a6f61" stroke-width="12" stroke-linecap="round"/>' +
           '<text x="176" y="295" class="component-label">体積 ' + Math.round(volume) + ' / 100</text><text x="385" y="295" class="component-label">手ごたえ ' + resistance + '</text></svg>';
       core.renderReadout(view.readout, {
         metrics: [
@@ -323,7 +323,7 @@
     return {
       render: draw,
       reset: () => { state.material = "air"; state.pressure = 55; material.set(state.material); pressure.set(state.pressure); draw(); },
-      step: () => { state.pressure = state.pressure >= 100 ? 0 : state.pressure + 20; pressure.set(state.pressure); draw(); }
+      step: () => { state.pressure = state.pressure >= 100 ? 0 : Math.min(100, state.pressure + 20); pressure.set(state.pressure); draw(); }
     };
   }
 
@@ -336,7 +336,7 @@
       const delta = state.temperature - 20;
       const coefficient = { air: .0034, water: .00021, metal: .00005 }[state.material];
       const percent = delta * coefficient * 100;
-      const radius = 43 * clamp(1 + percent / 100, .72, 1.35);
+      const radius = 43 * clamp(1 + percent * .15, .72, 1.35);
       const labels = { air:"空気", water:"水", metal:"金属" };
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="物の温度と体積の変化">' +
@@ -365,13 +365,12 @@
     const material = core.options(section, { label: "物", values: [option("metal", "金属"), option("water", "水"), option("air", "空気")], value: state.material, format: item => item.label, onChange: value => { state.material = value; draw(); } });
     const time = core.range(section, { label: "熱してからの時間", min: 0, max: 10, value: state.time, format: value => value, onInput: value => { state.time = value; draw(); } });
     function draw() {
-      const warm = state.time * 10;
       const isFlow = state.material !== "metal";
       const metalCells = Array.from({length:10}, (_, i) => {
         const reached = i <= state.time - 1;
         return '<rect x="' + (125 + i * 39) + '" y="145" width="39" height="95" fill="' + (reached ? "#dc7655" : "#c8d0ce") + '" opacity="' + (reached ? 1 - i * .045 : .65) + '"/>';
       }).join("");
-      const loops = '<path d="M210 245 C150 185 185 125 270 145 C350 165 355 235 285 250" fill="none" stroke="#4b94ae" stroke-width="8" stroke-dasharray="12 9" opacity="' + (state.time / 10) + '"/><path d="M430 245 C370 185 405 125 490 145 C550 165 555 225 500 250" fill="none" stroke="#d27b58" stroke-width="8" stroke-dasharray="12 9" opacity="' + (state.time / 10) + '"/>';
+      const loops = '<defs><marker id="heatArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#4b94ae"/></marker></defs><path d="M210 245 C150 185 185 125 270 145 C350 165 355 235 285 250" fill="none" stroke="#4b94ae" stroke-width="8" stroke-dasharray="12 9" marker-end="url(#heatArrow)" opacity="' + (state.time / 10) + '"/><path d="M430 245 C370 185 405 125 490 145 C550 165 555 225 500 250" fill="none" stroke="#d27b58" stroke-width="8" stroke-dasharray="12 9" marker-end="url(#heatArrow)" opacity="' + (state.time / 10) + '"/>';
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="物の温まり方">' +
           '<rect width="640" height="360" fill="#fff3ed"/><text x="28" y="42" class="scene-title">熱はどのように広がる？</text><text x="30" y="80" class="scene-caption">' + ({metal:"金属",water:"水",air:"空気"}[state.material]) + '　時間 ' + state.time + '</text>' +
@@ -402,12 +401,13 @@
       const stateName = isIce ? "氷（固体）" : freezing ? "氷と水" : boiling ? "水と水蒸気" : isSteam ? "水蒸気（気体）" : "水（液体）";
       const showIce = isIce || freezing, showWater = (!isIce && !isSteam), showSteam = boiling || isSteam;
       const particles = showSteam ? Array.from({ length: 12 }, (_, i) => '<circle cx="' + (160 + (i * 47) % 330) + '" cy="' + (125 + (i * 31) % 105) + '" r="6" fill="#a1c2cb" opacity=".55"/>').join("") : "";
+      const boilingBubbles = boiling ? Array.from({ length: 6 }, (_, i) => '<circle cx="' + (215 + i * 38) + '" cy="' + (252 - (i % 3) * 17) + '" r="5" fill="#e8fbff" stroke="#4b9db1" stroke-width="2"/>').join("") : "";
       const ice = showIce ? '<g fill="#b8e2ee" stroke="#5798aa" stroke-width="3"><path d="M235 215 l35 -35 55 12 19 53 -37 39 -57 -12z"/><path d="M270 180 l15 50 59 15"/></g>' : "";
       const water = showWater ? '<path d="M180 ' + (freezing ? 235 : 220) + ' Q320 ' + (freezing ? 220 : 190) + ' 460 ' + (freezing ? 235 : 220) + ' V285 H180Z" fill="#62b4c4" opacity=".78"/>' : "";
       view.stage.innerHTML =
         '<svg class="extra-svg" viewBox="0 0 640 360" role="img" aria-label="水の姿と温度">' +
           '<rect width="640" height="360" fill="#eef7fb"/><text x="28" y="42" class="scene-title">温度で水の姿が変わる</text><text x="30" y="80" class="scene-caption">' + t + '℃　→　' + stateName + '</text>' +
-          '<rect x="170" y="115" width="300" height="175" rx="18" fill="#fff" stroke="#6d9aa7" stroke-width="5"/>' + water + ice + particles +
+          '<rect x="170" y="115" width="300" height="175" rx="18" fill="#fff" stroke="#6d9aa7" stroke-width="5"/>' + water + boilingBubbles + ice + particles +
           '<line x1="500" y1="115" x2="500" y2="285" stroke="#8c6f62" stroke-width="7"/><circle cx="500" cy="' + (285 - clamp((t + 20) / 140, 0, 1) * 170) + '" r="12" fill="#d65d55"/><text x="520" y="205" class="component-label">温度計</text>' +
           '<text x="155" y="328" class="scene-caption">粒は、見えない水蒸気を表すモデルです</text></svg>';
       core.renderReadout(view.readout, {
