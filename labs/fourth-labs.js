@@ -288,19 +288,19 @@
       const speedLevel = effective === 0 ? 0 : Math.abs(effective) === 2 ? 2 : 1;
       const speedText = speedLevel === 0 ? "停止" : speedLevel === 2 ? "速い（模型上の目安）" : "回転する（模型上の目安）";
       const rotation = effective > 0 ? "右回り" : effective < 0 ? "左回り" : "停止";
+      const circuitColor = effective === 0 ? "#7e918d" : "#bd8a12";
       // Cells are drawn directly into the bottom wire so the closed series circuit is visible.
       const cellX = state.batteries === 1 ? [205] : [165, 275];
       const cells = cellX.map((x, i) => {
         const reversed = state.direction === "reverse" && (state.batteries === 1 || i === state.batteries - 1);
         const longX = x + (reversed ? 22 : 38);
         const shortX = x + (reversed ? 38 : 22);
-        return '<g><line x1="' + (x - 25) + '" y1="260" x2="' + (x + 12) + '" y2="260" stroke="' + circuitColor + '" stroke-width="6"/><line x1="' + (x + 48) + '" y1="260" x2="' + (x + 78) + '" y2="260" stroke="' + circuitColor + '" stroke-width="6"/><line x1="' + longX + '" y1="238" x2="' + longX + '" y2="282" stroke="#a27c22" stroke-width="7" stroke-linecap="round"/><line x1="' + shortX + '" y1="246" x2="' + shortX + '" y2="274" stroke="#a27c22" stroke-width="4" stroke-linecap="round"/><text x="' + (longX - 5) + '" y="230" class="tiny-label">' + (reversed ? "−" : "＋") + '</text><text x="' + (shortX - 5) + '" y="296" class="tiny-label">' + (reversed ? "＋" : "−") + '</text><text x="' + (x + 15) + '" y="318" class="tiny-label">乾電池</text></g>';
+        return '<g><line x1="' + (x - 25) + '" y1="260" x2="' + (x + 22) + '" y2="260" stroke="' + circuitColor + '" stroke-width="6"/><line x1="' + (x + 38) + '" y1="260" x2="' + (x + 78) + '" y2="260" stroke="' + circuitColor + '" stroke-width="6"/><line x1="' + longX + '" y1="238" x2="' + longX + '" y2="282" stroke="#a27c22" stroke-width="7" stroke-linecap="round"/><line x1="' + shortX + '" y1="246" x2="' + shortX + '" y2="274" stroke="#a27c22" stroke-width="4" stroke-linecap="round"/><text x="' + (longX - 5) + '" y="230" class="tiny-label">' + (reversed ? "−" : "＋") + '</text><text x="' + (shortX - 5) + '" y="296" class="tiny-label">' + (reversed ? "＋" : "−") + '</text><text x="' + (x + 15) + '" y="318" class="tiny-label">乾電池</text></g>';
       }).join("");
       const bottomWires = state.batteries === 1
         ? '<path d="M90 260 H180 M283 260 H510" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round"/>'
         : '<path d="M90 260 H140 M243 260 H250 M353 260 H510" fill="none" stroke="' + circuitColor + '" stroke-width="7" stroke-linecap="round"/>';
       const arrow = effective === 0 ? '<line x1="488" y1="165" x2="548" y2="165" stroke="#8b9694" stroke-width="8"/><text x="488" y="114" class="component-label">打ち消し合って停止</text>' : '<path d="' + (effective > 0 ? "M480 157 A38 38 0 1 1 540 132" : "M548 157 A38 38 0 1 0 488 132") + '" fill="none" stroke="#bd8a12" stroke-width="7" marker-end="url(#motorArrow)"/>';
-      const circuitColor = effective === 0 ? "#7e918d" : "#bd8a12";
       view.stage.innerHTML =
         '<svg class="extra-svg motor-circuit-diagram" viewBox="0 0 640 360" role="img" aria-label="乾電池の数と向きによってモーターの速さや回る向きが変わる回路">' +
           '<defs><marker id="motorArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#bd8a12"/></marker><linearGradient id="circuitBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbfaf2"/><stop offset="1" stop-color="#e8f0e9"/></linearGradient></defs><rect width="640" height="360" fill="url(#circuitBg)"/><path d="M0 90 H640 M0 180 H640 M0 270 H640" stroke="#d7e2d9" stroke-width="1" opacity=".55"/><text x="28" y="38" class="scene-title">乾電池の向き → モーターの回り方</text><text x="30" y="74" class="scene-caption">導線をたどって、電気の通り道を確かめよう</text>' +
